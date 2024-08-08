@@ -5,25 +5,15 @@ import com.chilly.main_svc.model.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserDtoModelMapper {
+public class UserDtoModelMapper extends BaseDtoMapper<User, UserDto> {
 
-    public UserDto toDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .phoneNumber(user.getPhoneNumber())
-                .email(user.getEmail())
-                .build();
+    @Override
+    protected Class<User> getEntityClass() {
+        return User.class;
     }
 
-    public User toModel(UserDto dto) {
-        return User.builder()
-                .id(dto.getId())
-                .email(dto.getEmail())
-                .phoneNumber(dto.getPhoneNumber())
-                .firstname(dto.getFirstname())
-                .lastname(dto.getLastname())
-                .build();
+    @Override
+    protected Class<UserDto> getDtoClass() {
+        return UserDto.class;
     }
 }

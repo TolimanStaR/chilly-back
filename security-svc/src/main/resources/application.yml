@@ -1,11 +1,11 @@
 spring:
   application:
-    name: main-svc
+    name: security-svc
 
   datasource:
-    url: "jdbc:postgresql://${MAIN_HOST}:5432/${MAIN_DB}" # host = localhost, db = main
-    username: "${MAIN_USER}" # user = main_user
-    password: "${MAIN_PASSWORD}" # password = main_password
+    url: "jdbc:postgresql://${SEC_HOST}:5433/${SEC_DB}" # host = localhost, db = main
+    username: "${SEC_USER}" # user = main_user
+    password: "${SEC_PASSWORD}" # password = main_password
     driver-class-name: org.postgresql.Driver
 
 
@@ -21,4 +21,4 @@ spring:
     database-platform:
 
 server:
-  port: 8080
+  port: 8081
