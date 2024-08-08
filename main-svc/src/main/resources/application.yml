@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: main-svc
+
+  datasource:
+    url: "jdbc:postgresql://${MAIN_HOST}:5432/${MAIN_DB}" # host = localhost, db = main
+    username: "${MAIN_USER}" # user = main_user
+    password: "${MAIN_PASSWORD}" # password = main_password
+    driver-class-name: org.postgresql.Driver
+
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    database: postgresql
+    database-platform:
