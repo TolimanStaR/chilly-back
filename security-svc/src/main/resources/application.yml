@@ -3,14 +3,14 @@ spring:
     name: security-svc
 
   datasource:
-    url: "jdbc:postgresql://${SEC_HOST}:5433/${SEC_DB}" # host = localhost, db = main
-    username: "${SEC_USER}" # user = main_user
-    password: "${SEC_PASSWORD}" # password = main_password
+    url: "jdbc:postgresql://${SEC_HOST}:5433/${SEC_DB}" # host = localhost, db = security
+    username: "${SEC_USER}" # user = sec_user
+    password: "${SEC_PASSWORD}" # password = sec_password
     driver-class-name: org.postgresql.Driver
 
 
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: create-drop
     properties:
