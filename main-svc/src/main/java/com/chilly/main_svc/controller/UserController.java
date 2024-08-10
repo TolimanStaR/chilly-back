@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/test")
+@RequestMapping("api/user")
 @RequiredArgsConstructor
-public class TestController {
+public class UserController {
 
     private final UserService userService;
 
