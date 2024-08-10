@@ -42,7 +42,7 @@ public class AuthService {
 
         try {
             webClient.post()
-                    .uri("http://localhost:8080/api/user")
+                    .uri("http://main-svc/api/user")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(dto)
                     .retrieve()
@@ -50,6 +50,8 @@ public class AuthService {
                     .block();
         }
         catch (Exception e) {
+            userRepository.deleteById(user.getId());
+
             log.warn("unable to save user because of exception {}, message: {}", e.getClass(), e.getMessage());
             throw new UserNotSavedError("request to main service failed");
         }
