@@ -10,6 +10,9 @@ import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,6 +24,8 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
@@ -64,10 +69,18 @@ public class AuthService {
 
         log.info("logging in user with credentials ({}, {})", request.getPhoneNumber(), request.getPassword());
 
-        // TODO authenticate user
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getPhoneNumber(),
+                        request.getPassword()
+                )
+        );
+        User authenticatedUser = userRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new UsernameNotFoundException("invalid username"));
 
+        final String accessToken = jwtService.generateToken(authenticatedUser);
         return TokenResponse.builder()
-                .accessToken("access-token")
+                .accessToken(accessToken)
                 .refreshToken("refresh-token")
                 .build();
     }
