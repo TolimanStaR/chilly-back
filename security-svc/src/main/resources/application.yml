@@ -32,6 +32,8 @@ security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
     expiration-time: 86400000
+  refresh-token:
+    expiration-time: 2592000000
 
 http:
   headers:

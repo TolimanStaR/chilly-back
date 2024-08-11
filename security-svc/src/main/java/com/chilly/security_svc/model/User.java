@@ -34,6 +34,10 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @OneToOne
+    @JoinColumn(name = "refresh_token_id")
+    private RefreshToken refreshToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

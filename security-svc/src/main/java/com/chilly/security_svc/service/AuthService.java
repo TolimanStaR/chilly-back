@@ -1,10 +1,10 @@
 package com.chilly.security_svc.service;
 
-import com.chilly.security_svc.dto.LoginRequest;
-import com.chilly.security_svc.dto.RegisterRequest;
-import com.chilly.security_svc.dto.TokenResponse;
-import com.chilly.security_svc.dto.UserDto;
+import com.chilly.security_svc.dto.*;
+import com.chilly.security_svc.error.ExpiredRefreshTokenException;
+import com.chilly.security_svc.error.NoUserForRefreshTokenException;
 import com.chilly.security_svc.error.UserNotSavedError;
+import com.chilly.security_svc.model.RefreshToken;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
@@ -46,9 +47,18 @@ public class AuthService {
     public TokenResponse loginUser(LoginRequest request) {
         User authenticatedUser = authenticateUser(request);
 
-        final String accessToken = jwtService.generateToken(authenticatedUser, authenticatedUser.getId());
-        final String refreshToken = "refresh-token";
-        return new TokenResponse(accessToken, refreshToken);
+        return generateTokensForUser(authenticatedUser);
+    }
+
+    public TokenResponse refresh(RefreshRequest request) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(request.getToken())
+                .orElseThrow(() -> new NoUserForRefreshTokenException("no user for token"));
+
+        if (refreshTokenService.isExpired(refreshToken)) {
+            throw new ExpiredRefreshTokenException("refresh token is expired");
+        }
+        User user = refreshToken.getUser();
+        return generateTokensForUser(user);
     }
 
     private User buildUserFromRequest(RegisterRequest request) {
@@ -88,5 +98,11 @@ public class AuthService {
         );
         return userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new UsernameNotFoundException("invalid username"));
+    }
+
+    private TokenResponse generateTokensForUser(User user) {
+        final String accessToken = jwtService.generateToken(user, user.getId());
+        final String refreshToken = refreshTokenService.generateRefreshToken(user);
+        return new TokenResponse(accessToken, refreshToken);
     }
 }

@@ -10,7 +10,27 @@ public class GlobalErrorHandler {
 
     @ExceptionHandler(UserNotSavedError.class)
     public ResponseEntity<ErrorResponse> handleNotSavedError(UserNotSavedError error) {
-        ErrorResponse response = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), error.getMessage());
+        return wrapException(HttpStatus.INTERNAL_SERVER_ERROR, error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotSavedError(UserNotFoundException error) {
+        return wrapException(HttpStatus.NOT_FOUND, error);
+    }
+
+    @ExceptionHandler(NoUserForRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleNotSavedError(NoUserForRefreshTokenException error) {
+        return wrapException(HttpStatus.UNAUTHORIZED, error);
+    }
+
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleNotSavedError(ExpiredRefreshTokenException error) {
+        return wrapException(HttpStatus.UNAUTHORIZED, error);
+    }
+
+
+    private ResponseEntity<ErrorResponse> wrapException(HttpStatus status, Exception exception) {
+        ErrorResponse response = new ErrorResponse(status.value(), exception.getMessage());
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 }
