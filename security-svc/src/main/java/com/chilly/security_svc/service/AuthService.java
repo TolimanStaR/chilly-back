@@ -29,59 +29,64 @@ public class AuthService {
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
-        User user = userRepository.save(
-                User.builder()
-                        .email(request.getEmail())
-                        .phoneNumber(request.getPhoneNumber())
-                        .password(passwordEncoder.encode(request.getPassword()))
-                        .build()
-        );
 
-        UserDto dto = UserDto.builder()
+        // TODO check email and phone number validity and availability
+
+        User user = userRepository.save(buildUserFromRequest(request));
+        UserDto dto = convertToUserDto(user, request);
+
+        try {
+            sendUserDtoToMainService(dto);
+        } catch (Exception e) {
+            userRepository.deleteById(user.getId());
+            throw new UserNotSavedError("request to main service failed");
+        }
+    }
+
+    public TokenResponse loginUser(LoginRequest request) {
+        User authenticatedUser = authenticateUser(request);
+
+        final String accessToken = jwtService.generateToken(authenticatedUser, authenticatedUser.getId());
+        final String refreshToken = "refresh-token";
+        return new TokenResponse(accessToken, refreshToken);
+    }
+
+    private User buildUserFromRequest(RegisterRequest request) {
+        return User.builder()
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
+    }
+
+    private UserDto convertToUserDto(User user, RegisterRequest request) {
+        return UserDto.builder()
                 .id(user.getId())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .build();
-
-        try {
-            webClient.post()
-                    .uri("http://main-svc/api/user")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(dto)
-                    .retrieve()
-                    .bodyToMono(Void.class)
-                    .block();
-        }
-        catch (Exception e) {
-            userRepository.deleteById(user.getId());
-
-            log.warn("unable to save user because of exception {}, message: {}", e.getClass(), e.getMessage());
-            throw new UserNotSavedError("request to main service failed");
-        }
-
-
-        log.info("new user registered: {}", dto);
     }
 
-    public TokenResponse loginUser(LoginRequest request) {
+    private void sendUserDtoToMainService(UserDto dto) {
+        webClient.post()
+                .uri("http://main-svc/api/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
 
-        log.info("logging in user with credentials ({}, {})", request.getPhoneNumber(), request.getPassword());
-
+    private User authenticateUser(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getPhoneNumber(),
                         request.getPassword()
                 )
         );
-        User authenticatedUser = userRepository.findByPhoneNumber(request.getPhoneNumber())
+        return userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new UsernameNotFoundException("invalid username"));
-
-        final String accessToken = jwtService.generateToken(authenticatedUser);
-        return TokenResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken("refresh-token")
-                .build();
     }
 }
