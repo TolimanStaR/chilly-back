@@ -13,6 +13,8 @@ import lombok.*;
 public class QuizAnswer {
 
     @Id
+    @SequenceGenerator(name = "quiz_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quiz_sequence")
     @Column(name = "id")
     private Long id;
 

@@ -20,8 +20,9 @@ public class GatewayConfig {
         return routeLocatorBuilder.routes()
                 .route(
                         "main-svc",
-                        r -> r.path("/main-svc/v3/api-docs").or()
-                                .path("/api/user").and().method(HttpMethod.GET)
+                        r -> r.path("/api/user").and().method(HttpMethod.GET).or()
+                                .path("/main-svc/v3/api-docs").or()
+                                .path("/api/questions")
                                 .filters(this::applyAuthFilter)
                                 .uri("lb://main-svc")
                 )

@@ -16,6 +16,8 @@ import java.util.Set;
 public class Question {
 
     @Id
+    @SequenceGenerator(name = "question_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "question_sequence")
     @Column(name = "id")
     private Long id;
 
@@ -27,6 +29,7 @@ public class Question {
     private String body;
 
     @OneToMany(mappedBy = "question", orphanRemoval = true)
+    @Builder.Default
     private Set<Answer> answers = new LinkedHashSet<>();
 
 }
