@@ -11,7 +11,7 @@ import java.util.List;
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "user")
-@Table(name = "users")
+@Table(name = "security_users")
 @Getter
 @Setter
 @NoArgsConstructor
