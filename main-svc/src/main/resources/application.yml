@@ -27,3 +27,13 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+
+
+springdoc:
+  swagger-ui:
+    try-it-out-enabled: true
+    operations-sorter: method
+    path: /main-svc/swagger-ui.html
+    url: http://localhost:8080
+  api-docs:
+    path: /main-svc/v3/api-docs

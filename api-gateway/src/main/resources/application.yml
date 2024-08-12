@@ -15,3 +15,15 @@ security:
 http:
   headers:
     user-id: UserId
+
+springdoc:
+  swagger-ui:
+    url: http://localhost:8080/v3/api-cods
+    config-url: http://localhost:8080/v3/api-docs/swagger-config
+    urls:
+      - url: /main-svc/v3/api-docs
+        name: Main Service
+      - url: /security-svc/v3/api-docs
+        name: Security Service
+  api-docs:
+    enabled: true
