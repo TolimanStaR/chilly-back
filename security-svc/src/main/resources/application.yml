@@ -3,7 +3,7 @@ spring:
     name: security-svc
 
   datasource:
-    url: "jdbc:postgresql://${SEC_HOST}:5433/${SEC_DB}" # host = localhost, db = security
+    url: "jdbc:postgresql://${SEC_HOST}:${SEC_DB_PORT}/${SEC_DB}" # host = localhost, db = security
     username: "${SEC_USER}" # user = sec_user
     password: "${SEC_PASSWORD}" # password = sec_password
     driver-class-name: org.postgresql.Driver
@@ -27,7 +27,7 @@ eureka:
 
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
+    secret-key: "${JWT_SECRET_KEY}"
     expiration-time: 86400000
   refresh-token:
     expiration-time: 2592000000

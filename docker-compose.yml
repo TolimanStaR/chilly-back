@@ -1,0 +1,101 @@
+services:
+
+  main_db:
+    image: postgres:alpine
+    volumes:
+      - main_pg_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "${MAIN_DB}"
+      POSTGRES_USER: "${MAIN_USER}"
+      POSTGRES_PASSWORD: "${MAIN_PASSWORD}"
+    restart: unless-stopped
+    command:
+      - "-p ${MAIN_DB_PORT}"
+    networks:
+      - chilly-net
+
+  security_db:
+    image: postgres:alpine
+    volumes:
+      - security_pg_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "${SEC_DB}"
+      POSTGRES_USER: "${SEC_USER}"
+      POSTGRES_PASSWORD: "${SEC_PASSWORD}"
+    restart: unless-stopped
+    command:
+      - "-p ${SEC_DB_PORT}"
+    networks:
+      - chilly-net
+
+  eureka:
+    image: "tolimanstar/chilly_discovery_server:latest"
+    build:
+      context: ./
+      dockerfile: ./discovery-server/Dockerfile
+    expose:
+      - "8761"
+    environment:
+      SPRING_PROFILE_ACTIVE: docker
+    networks:
+      - chilly-net
+
+  gateway:
+    depends_on:
+      - main
+      - security
+    image: "tolimanstar/cilly_gateway:latest"
+    build:
+      context: ./
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
+    networks:
+      - chilly-net
+
+  main:
+    depends_on:
+      - main_db
+      - eureka
+    image: "tolimanstar/chilly_main:latest"
+    build:
+      context: ./
+      dockerfile: ./main-svc/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MAIN_DB: "${MAIN_DB}"
+      MAIN_HOST: main_db
+      MAIN_USER: "${MAIN_USER}"
+      MAIN_PASSWORD: "${MAIN_PASSWORD}"
+      MAIN_DB_PORT: "${MAIN_DB_PORT}"
+    networks:
+      - chilly-net
+
+  security:
+    depends_on:
+      - security_db
+      - eureka
+    image: "tolimanstar/chilly_security:latest"
+    build:
+      context: ./
+      dockerfile: ./security-svc/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SEC_DB: "${SEC_DB}"
+      SEC_HOST: security_db
+      SEC_USER: "${SEC_USER}"
+      SEC_PASSWORD: "${SEC_PASSWORD}"
+      SEC_DB_PORT: "${SEC_DB_PORT}"
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
+    networks:
+      - chilly-net
+
+volumes:
+  main_pg_volume:
+  security_pg_volume:
+
+networks:
+  chilly-net: {}

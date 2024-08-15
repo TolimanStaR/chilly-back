@@ -9,12 +9,15 @@ eureka:
 
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
+    secret-key: "${JWT_SECRET_KEY}"
     expiration-time: 86400000
 
 http:
   headers:
     user-id: UserId
+
+server:
+  port: 8080
 
 springdoc:
   swagger-ui:

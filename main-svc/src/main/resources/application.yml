@@ -3,7 +3,7 @@ spring:
     name: main-svc
 
   datasource:
-    url: "jdbc:postgresql://${MAIN_HOST}:5432/${MAIN_DB}" # host = localhost, db = main
+    url: "jdbc:postgresql://${MAIN_HOST}:${MAIN_DB_PORT}/${MAIN_DB}" # host = localhost, db = main
     username: "${MAIN_USER}" # user = main_user
     password: "${MAIN_PASSWORD}" # password = main_password
     driver-class-name: org.postgresql.Driver
@@ -19,6 +19,10 @@ spring:
 
 server:
   port: 0
+
+http:
+  headers:
+    user-id: UserId
 
 eureka:
   client:
