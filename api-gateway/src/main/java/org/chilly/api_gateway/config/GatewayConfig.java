@@ -22,7 +22,8 @@ public class GatewayConfig {
                         "main-svc",
                         r -> r.path("/api/user").and().method(HttpMethod.GET).or()
                                 .path("/main-svc/v3/api-docs").or()
-                                .path("/api/questions")
+                                .path("/api/questions").or()
+                                .path("/api/quiz", "/api/quiz/**")
                                 .filters(this::applyAuthFilter)
                                 .uri("lb://main-svc")
                 )

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,14 @@ public class QuestionService {
                 .map(questionMapper::toDto)
                 .toList();
         return new QuizResponse(type, questionList);
+    }
+
+    public void modifyQuestion(Long id, QuestionWithAnswers newQuestion) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow();
+        
+        question.setBody(newQuestion.getQuestionText());
+        question.setAnswers(saveAnswers(newQuestion.getAnswers()));
     }
 
     private void saveQuestionWithAnswers(QuestionWithAnswers questionWithAnswers, QuizType type) {
@@ -61,5 +70,19 @@ public class QuestionService {
                 .question(question)
                 .build();
 
+    }
+
+    private Answer buildAnswerWithNoQuestion(String answerText) {
+        return Answer.builder()
+                .body(answerText)
+                .build();
+    }
+
+    private Set<Answer> saveAnswers(List<String> answerTexts) {
+        List<Answer> answers = answerTexts.stream()
+                .map(this::buildAnswerWithNoQuestion)
+                .toList();
+
+        return Set.copyOf(answerRepository.saveAll(answers));
     }
 }

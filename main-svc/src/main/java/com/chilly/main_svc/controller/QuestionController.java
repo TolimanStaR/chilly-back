@@ -1,5 +1,6 @@
 package com.chilly.main_svc.controller;
 
+import com.chilly.main_svc.dto.QuestionWithAnswers;
 import com.chilly.main_svc.dto.QuizResponse;
 import com.chilly.main_svc.dto.QuizSaveRequest;
 import com.chilly.main_svc.model.QuizType;
@@ -37,6 +38,16 @@ public class QuestionController {
     @GetMapping
     public QuizResponse getQuiz(@RequestParam QuizType type) {
         return questionService.getQuiz(type);
+    }
+
+    @Operation(summary = "modify question by id, provide new answers, or change Text")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void modifyQuestion(
+            @PathVariable("id") Long id,
+            @RequestBody QuestionWithAnswers newQuestion
+    ) {
+        questionService.modifyQuestion(id, newQuestion);
     }
 
 }

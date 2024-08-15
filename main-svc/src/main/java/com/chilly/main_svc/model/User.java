@@ -32,6 +32,7 @@ public class User {
     private String email;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @Builder.Default
     private Set<QuizAnswer> quizAnswers = new LinkedHashSet<>();
 
 }
