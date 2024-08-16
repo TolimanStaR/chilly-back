@@ -1,5 +1,6 @@
 package com.chilly.security_svc.config;
 
+import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,14 +14,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 @Configuration
 public class AppConfig {
-
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository repository) {
-        return username -> repository.findByPhoneNumber(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

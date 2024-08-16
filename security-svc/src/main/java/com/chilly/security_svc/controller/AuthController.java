@@ -6,6 +6,7 @@ import com.chilly.security_svc.dto.RegisterRequest;
 import com.chilly.security_svc.dto.TokenResponse;
 import com.chilly.security_svc.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,10 @@ public class AuthController {
         authService.registerUser(request);
     }
 
-    @Operation(summary = "log in existing user")
+    @Operation(
+            summary = "log in existing user",
+            description = "generates token pair for user by username that can be either phone or email and password"
+    )
     @PostMapping("login")
     @Transactional
     public TokenResponse login(@RequestBody LoginRequest request) {

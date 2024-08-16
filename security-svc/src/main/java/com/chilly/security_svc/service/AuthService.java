@@ -3,6 +3,7 @@ package com.chilly.security_svc.service;
 import com.chilly.security_svc.dto.*;
 import com.chilly.security_svc.error.ExpiredRefreshTokenException;
 import com.chilly.security_svc.error.NoUserForRefreshTokenException;
+import com.chilly.security_svc.error.UserNotFoundException;
 import com.chilly.security_svc.error.UserNotSavedError;
 import com.chilly.security_svc.model.RefreshToken;
 import com.chilly.security_svc.model.User;
@@ -23,6 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserFindService userFindService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -46,7 +48,6 @@ public class AuthService {
 
     public TokenResponse loginUser(LoginRequest request) {
         User authenticatedUser = authenticateUser(request);
-
         return generateTokensForUser(authenticatedUser);
     }
 
@@ -92,13 +93,13 @@ public class AuthService {
     private User authenticateUser(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getPhoneNumber(),
+                        request.getUsername(),
                         request.getPassword()
                 )
         );
-        return userRepository.findByPhoneNumber(request.getPhoneNumber())
-                .orElseThrow(() -> new UsernameNotFoundException("invalid username"));
+        return userFindService.loadByPhoneOrByEmail(request.getUsername());
     }
+
 
     private TokenResponse generateTokensForUser(User user) {
         final String accessToken = jwtService.generateToken(user, user.getId());
