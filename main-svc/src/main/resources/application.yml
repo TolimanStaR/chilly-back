@@ -20,10 +20,6 @@ spring:
 server:
   port: 0
 
-http:
-  headers:
-    user-id: UserId
-
 eureka:
   client:
     serviceUrl:

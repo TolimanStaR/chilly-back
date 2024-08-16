@@ -1,0 +1,8 @@
+security:
+  jwt:
+    secret-key: test-key
+    expiration-time: 0
+
+http:
+  headers:
+    user-id: UserId

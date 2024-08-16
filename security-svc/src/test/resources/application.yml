@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: main-svc-test
+
+  datasource:
+    url: "${DB_URL}"
+    username: "${DB_USER}"
+    password: "${DB_PASSWORD}"
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    baseline-on-migrate: true
+
+  jpa:
+    show-sql: false
+    database: postgresql
+    hibernate:
+      ddl-auto: validate
+
+security:
+  jwt:
+    secret-key: some-key
+    expiration-time: 0
+  refresh-token:
+    expiration-time: 0
+
+http:
+  headers:
+    user-id: UserId
