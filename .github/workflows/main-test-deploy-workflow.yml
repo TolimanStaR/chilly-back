@@ -34,6 +34,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - uses: actions/checkout@v4.1.7
+      - uses: amplium/git-crypt-action@v0.1.5
+        with:
+          key_encoded: ${{ secrets.GIT_CRYPT_KEY }}
+
       - name: Docker Compose Build & Push
         uses: 0x4r45h/docker-compose-ci@v0.1.1
 
