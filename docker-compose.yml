@@ -39,6 +39,8 @@ services:
       dockerfile: ./discovery-server/Dockerfile
     expose:
       - "8761"
+    ports:
+      - "8761:8761"
     environment:
       SPRING_PROFILE_ACTIVE: docker
     networks:
