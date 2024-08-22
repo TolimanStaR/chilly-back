@@ -4,7 +4,9 @@ import com.chilly.main_svc.mapper.ListToStringConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "place")
 @Table(name = "places")
@@ -48,4 +50,9 @@ public class Place {
     @Column(name = "open_hours")
     @Convert(converter = ListToStringConverter.class)
     private List<String> openHours;
+
+    @OneToMany(mappedBy = "place", orphanRemoval = true)
+    @Builder.Default
+    private Set<Visit> visits = new LinkedHashSet<>();
+
 }
