@@ -99,6 +99,19 @@ services:
     networks:
       - chilly-net
 
+#  rec:
+#    depends_on:
+#      - main
+#      - security
+#    image: "tolimanstar/chilly_rec:latest"
+#    ports:
+#      - "8000:8000"
+#    environment:
+#      EUREKA_URL: "http://eureka:8761"
+#      REC_HOST: rec
+#    networks:
+#      - chilly-net
+
 volumes:
   main_pg_volume:
   security_pg_volume:
