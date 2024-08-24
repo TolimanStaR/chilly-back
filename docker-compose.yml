@@ -15,6 +15,12 @@ services:
       - "${MAIN_DB_PORT}:${MAIN_DB_PORT}"
     networks:
       - chilly-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MAIN_USER} -d ${MAIN_PASSWORD} -p ${MAIN_DB_PORT}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 7s
 
   security_db:
     image: postgres:alpine
@@ -31,6 +37,12 @@ services:
       - "${SEC_DB_PORT}:${SEC_DB_PORT}"
     networks:
       - chilly-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SEC_USER} -d ${SEC_PASSWORD} -p ${SEC_DB_PORT}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 7s
 
   eureka:
     image: "tolimanstar/chilly_discovery_server:latest"
@@ -45,27 +57,19 @@ services:
       SPRING_PROFILE_ACTIVE: docker
     networks:
       - chilly-net
-
-  gateway:
-    depends_on:
-      - main
-      - security
-    image: "tolimanstar/cilly_gateway:latest"
-    build:
-      context: ./
-      dockerfile: ./api-gateway/Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
-    networks:
-      - chilly-net
+    healthcheck:
+      test: "curl --fail --silent --request GET http://eureka:8761/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   main:
     depends_on:
-      - main_db
-      - eureka
+      main_db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
     image: "tolimanstar/chilly_main:latest"
     build:
       context: ./
@@ -82,8 +86,10 @@ services:
 
   security:
     depends_on:
-      - security_db
-      - eureka
+      security_db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
     image: "tolimanstar/chilly_security:latest"
     build:
       context: ./
@@ -99,10 +105,26 @@ services:
     networks:
       - chilly-net
 
+  gateway:
+    depends_on:
+      eureka:
+        condition: service_healthy
+    image: "tolimanstar/cilly_gateway:latest"
+    build:
+      context: ./
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
+    networks:
+      - chilly-net
+
 #  rec:
 #    depends_on:
-#      - main
-#      - security
+#      eureka:
+#        condition: service_healthy
 #    image: "tolimanstar/chilly_rec:latest"
 #    ports:
 #      - "8000:8000"
