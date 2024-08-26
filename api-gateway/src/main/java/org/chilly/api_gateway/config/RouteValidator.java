@@ -14,7 +14,8 @@ public class RouteValidator {
             "/api/auth/login",
             "/api/auth/refresh",
             "/api-docs",
-            "/swagger-ui"
+            "/swagger-ui",
+            "/actuator"
     );
 
     private final Predicate<ServerHttpRequest> securedPredicate = (request) -> {

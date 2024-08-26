@@ -16,7 +16,7 @@ services:
     networks:
       - chilly-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${MAIN_USER} -d ${MAIN_PASSWORD} -p ${MAIN_DB_PORT}"]
+      test: ["CMD-SHELL", "pg_isready -U ${MAIN_USER} -d ${MAIN_DB} -p ${MAIN_DB_PORT}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,7 +38,7 @@ services:
     networks:
       - chilly-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${SEC_USER} -d ${SEC_PASSWORD} -p ${SEC_DB_PORT}"]
+      test: ["CMD-SHELL", "pg_isready -U ${SEC_USER} -d ${SEC_DB} -p ${SEC_DB_PORT}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,9 +60,9 @@ services:
     healthcheck:
       test: "curl --fail --silent --request GET http://eureka:8761/actuator/health | grep UP || exit 1"
       interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      timeout: 7s
+      retries: 7
+      start_period: 15s
 
   main:
     depends_on:
@@ -120,6 +120,12 @@ services:
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
     networks:
       - chilly-net
+    healthcheck:
+      test: "curl --fail --silent --request GET http://gateway:8080/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 7s
+      retries: 7
+      start_period: 15s
 
 #  rec:
 #    depends_on:
