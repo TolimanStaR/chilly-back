@@ -21,8 +21,8 @@ server:
 
 springdoc:
   swagger-ui:
-    url: http://localhost:${GATEWAY_PORT}/v3/api-cods
-    config-url: http://localhost:${GATEWAY_PORT}/v3/api-docs/swagger-config
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
     urls:
       - url: /main-svc/v3/api-docs
         name: Main Service
