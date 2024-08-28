@@ -3,8 +3,8 @@ package com.chilly.security_svc.service;
 import com.chilly.security_svc.dto.*;
 import com.chilly.security_svc.error.ExpiredRefreshTokenException;
 import com.chilly.security_svc.error.NoUserForRefreshTokenException;
-import com.chilly.security_svc.error.UserNotFoundException;
 import com.chilly.security_svc.error.UserNotSavedError;
+import com.chilly.security_svc.error.NoUsernameProvidedException;
 import com.chilly.security_svc.model.RefreshToken;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,14 +31,16 @@ public class AuthService {
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
-
-        // TODO check email and phone number validity and availability
+        if (request.getPhoneNumber() == null && request.getEmail() == null) {
+            throw new NoUsernameProvidedException("to be registered user should have either phone or email");
+        }
 
         User user = userRepository.save(buildUserFromRequest(request));
         UserDto dto = convertToUserDto(user, request);
 
         try {
             sendUserDtoToMainService(dto);
+            log.info("user (id=" + dto.getId() + ") saved");
         } catch (Exception e) {
             userRepository.deleteById(user.getId());
             throw new UserNotSavedError("request to main service failed");

@@ -41,6 +41,6 @@ springdoc:
     try-it-out-enabled: true
     operations-sorter: method
     path: /security-svc/swagger-ui.html
-    url: http://localhost:8080
+    url: http://localhost:${GATEWAY_PORT}
   api-docs:
     path: /security-svc/v3/api-docs

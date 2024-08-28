@@ -28,6 +28,11 @@ public class GlobalErrorHandler {
         return wrapException(HttpStatus.UNAUTHORIZED, error);
     }
 
+    @ExceptionHandler(NoUsernameProvidedException.class)
+    public ResponseEntity<ErrorResponse> handleNoUsernameProvided(NoUsernameProvidedException error) {
+        return wrapException(HttpStatus.BAD_REQUEST, error);
+    }
+
 
     private ResponseEntity<ErrorResponse> wrapException(HttpStatus status, Exception exception) {
         ErrorResponse response = new ErrorResponse(status.value(), exception.getMessage());

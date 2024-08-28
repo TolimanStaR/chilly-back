@@ -1,0 +1,16 @@
+CREATE SEQUENCE IF NOT EXISTS visit_sequence START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE visits
+(
+    id       BIGINT NOT NULL,
+    user_id  BIGINT,
+    place_id BIGINT,
+    date     TIMESTAMP WITHOUT TIME ZONE,
+    CONSTRAINT pk_visits PRIMARY KEY (id)
+);
+
+ALTER TABLE visits
+    ADD CONSTRAINT FK_VISITS_ON_PLACE FOREIGN KEY (place_id) REFERENCES places (id);
+
+ALTER TABLE visits
+    ADD CONSTRAINT FK_VISITS_ON_USER FOREIGN KEY (user_id) REFERENCES main_users (id);
