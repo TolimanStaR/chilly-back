@@ -17,7 +17,7 @@ http:
     user-id: UserId
 
 server:
-  port: 8080
+  port: ${GATEWAY_PORT}
 
 springdoc:
   swagger-ui:
