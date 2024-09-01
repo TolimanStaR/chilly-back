@@ -1,10 +1,7 @@
 package com.chilly.security_svc.service;
 
 import com.chilly.security_svc.dto.*;
-import com.chilly.security_svc.error.ExpiredRefreshTokenException;
-import com.chilly.security_svc.error.NoUserForRefreshTokenException;
-import com.chilly.security_svc.error.UserNotSavedError;
-import com.chilly.security_svc.error.NoUsernameProvidedException;
+import com.chilly.security_svc.error.*;
 import com.chilly.security_svc.model.RefreshToken;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
@@ -31,8 +28,16 @@ public class AuthService {
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
-        if (request.getPhoneNumber() == null && request.getEmail() == null) {
-            throw new NoUsernameProvidedException("to be registered user should have either phone or email");
+        if (request.getPhoneNumber() == null || request.getEmail() == null) {
+            throw new NoUsernameProvidedException("to be registered user should have phone and email");
+        }
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new UserAlreadyExitsException("email already in use");
+        }
+
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
+            throw new UserAlreadyExitsException("phone number already in use");
         }
 
         User user = userRepository.save(buildUserFromRequest(request));

@@ -38,6 +38,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "refresh_token_id")
     private RefreshToken refreshToken;
 
+    @Column(name = "recovery_code")
+    private String recoveryCode;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

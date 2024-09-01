@@ -30,7 +30,11 @@ public class GatewayConfig {
                 )
                 .route(
                         "security-svc",
-                        r -> r.path("/api/auth/**", "/security-svc/v3/api-docs")
+                        r -> r.path("/api/auth/**", "/security-svc/v3/api-docs").or()
+                                .path("/api/password").or()
+                                .path("/api/email_code").or()
+                                .path("/api/password/recovery").or()
+                                .path("/api/email_code/verification")
                                 .filters(this::applyAuthFilter)
                                 .uri("lb://security-svc")
                 )
