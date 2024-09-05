@@ -10,8 +10,8 @@ import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ import java.util.Random;
 public class PasswordService {
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
-    private final JavaMailSender mailSender;
+    private final MailSender mailSender;
     private final SimpleMailMessage messageTemplate;
     private final Random random = new Random();
 

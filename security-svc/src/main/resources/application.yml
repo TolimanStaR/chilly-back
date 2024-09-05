@@ -18,8 +18,8 @@ spring:
       ddl-auto: validate
 
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: smtp.mail.ru
+    port: 465
     username: "${EMAIL_USERNAME}"
     password: "${EMAIL_PASSWORD}"
 
@@ -27,8 +27,11 @@ spring:
       mail:
         smtp:
           auth: true
-          starttls:
-            enabled: true
+          transport:
+            protocol: smtp
+          ssl:
+            enable: true
+
 
 server:
   port: 0
