@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Questions", description = "Question related API")
@@ -26,6 +27,7 @@ public class QuestionController {
             description = "Takes questions and answers, saves them into database, all previous questions will be deleted"
     )
     @PostMapping
+    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public void saveQuiz(
             @RequestParam QuizType type,
@@ -42,6 +44,7 @@ public class QuestionController {
 
     @Operation(summary = "modify question by id, provide new answers, or change Text")
     @PutMapping("/{id}")
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public void modifyQuestion(
             @PathVariable("id") Long id,
