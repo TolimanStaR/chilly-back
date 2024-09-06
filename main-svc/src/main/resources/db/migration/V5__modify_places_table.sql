@@ -1,0 +1,14 @@
+DROP SEQUENCE IF EXISTS place_sequence;
+
+ALTER TABLE places
+    ALTER COLUMN images TYPE VARCHAR(1023);
+
+ALTER TABLE places
+    ALTER COLUMN social TYPE VARCHAR(1023);
+
+ALTER TABLE places
+    ALTER COLUMN open_hours TYPE VARCHAR(1023);
+
+
+
+

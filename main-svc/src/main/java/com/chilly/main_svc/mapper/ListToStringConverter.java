@@ -8,14 +8,20 @@ import java.util.List;
 
 @Converter
 public class ListToStringConverter implements AttributeConverter<List<String>, String> {
-    private final String DELIMITER = "<*>";
+    private final String DELIMITER = "###";
     @Override
     public String convertToDatabaseColumn(List<String> strings) {
+        if (strings == null || strings.isEmpty()) {
+            return null;
+        }
         return String.join(DELIMITER, strings);
     }
 
     @Override
     public List<String> convertToEntityAttribute(String s) {
+        if (s == null) {
+            return List.of();
+        }
         return Arrays.asList(s.split(DELIMITER));
     }
 }
