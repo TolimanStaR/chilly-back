@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Quizzes", description = "Quiz related API")
@@ -22,6 +23,7 @@ public class QuizController {
 
     @Operation(summary = "saves user's answers for quiz questions")
     @PostMapping
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public void submitAnswers(
             @Parameter(description = "this header is calculated automatically, it should not be set")
@@ -33,6 +35,7 @@ public class QuizController {
 
     @Operation(summary = "change answer for question by its id")
     @PutMapping("/question")
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public void modifyQuizAnswer(
             @RequestHeader("UserId") Long userId,

@@ -15,6 +15,7 @@ import com.chilly.main_svc.model.User;
 import com.chilly.main_svc.repository.PlaceRepository;
 import com.chilly.main_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationService {
     private final UserRepository userRepository;
     private final PlaceRepository placeRepository;
@@ -40,6 +42,8 @@ public class RecommendationService {
                 .orElseThrow(() -> new UserNotFoundException("no user with id = " + userId));
 
         Set<QuizAnswer> userAnswers = user.getQuizAnswers();
+        log.info("user has {} saved quiz answers", userAnswers.size());
+
         List<QuizAnswerForRecDto> shortAnswers = filterAndMapAnswers(userAnswers, QuizType.SHORT);
         List<QuizAnswerForRecDto> baseAnswers = filterAndMapAnswers(userAnswers, QuizType.BASE);
 

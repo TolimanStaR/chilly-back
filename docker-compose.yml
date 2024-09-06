@@ -11,6 +11,8 @@ services:
     restart: unless-stopped
     command:
       - "-p ${MAIN_DB_PORT}"
+    ports:
+      - "${MAIN_DB_PORT}:${MAIN_DB_PORT}"
     networks:
       - chilly-net
     healthcheck:
