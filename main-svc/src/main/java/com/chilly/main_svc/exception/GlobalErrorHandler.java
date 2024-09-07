@@ -23,6 +23,11 @@ public class GlobalErrorHandler {
         return wrapException(HttpStatus.NOT_ACCEPTABLE, exception);
     }
 
+    @ExceptionHandler(NoSuchEntityException.class)
+    public ResponseEntity<ErrorResponse> handleNotSavedError(NoSuchEntityException exception) {
+        return wrapException(HttpStatus.BAD_REQUEST, exception);
+    }
+
     private ResponseEntity<ErrorResponse> wrapException(HttpStatus status, Exception exception) {
         ErrorResponse response = new ErrorResponse(status.value(), exception.getMessage());
         return ResponseEntity.status(response.getStatusCode()).body(response);

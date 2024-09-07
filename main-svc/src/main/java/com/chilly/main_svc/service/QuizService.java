@@ -2,6 +2,7 @@ package com.chilly.main_svc.service;
 
 import com.chilly.main_svc.dto.QuizAnswerDto;
 import com.chilly.main_svc.dto.QuizAnswersDto;
+import com.chilly.main_svc.exception.NoSuchEntityException;
 import com.chilly.main_svc.exception.UserNotFoundException;
 import com.chilly.main_svc.model.*;
 import com.chilly.main_svc.repository.AnswerRepository;
@@ -13,10 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,46 +28,49 @@ public class QuizService {
 
     public void submitAnswers(Long userId, QuizAnswersDto answersDto) {
         User user = findUserOrException(userId);
+        List<QuizAnswer> answersToRemove = user.getQuizAnswers().stream()
+                .filter(hasSameType(answersDto.getType()))
+                .toList();
 
-        Set<QuizAnswer> newAnswers = user.getQuizAnswers()
-                .stream()
-                .filter(hasOtherType(answersDto.getType()))
-                .collect(Collectors.toSet());
-
-        newAnswers.addAll(convertAnswersToEntities(answersDto.getAnswers()));
-        user.setQuizAnswers(newAnswers);
+        quizRepository.deleteAll(answersToRemove);
+        saveNewAnswers(answersDto.getAnswers(), user);
     }
 
     public void modifyAnswer(Long userId, QuizAnswerDto answerDto) {
         User user = findUserOrException(userId);
-
-        Set<QuizAnswer> newAnswers = user.getQuizAnswers().stream()
-                .map(answerByIdReplacer(answerDto))
-                .collect(Collectors.toSet());
-        user.setQuizAnswers(newAnswers);
+        user.getQuizAnswers().forEach(checkIdAndModify(answerDto));
     }
 
-    private Predicate<QuizAnswer> hasOtherType(QuizType type) {
-        return answer -> answer.getQuestion().getQuizType() != type;
+    private Predicate<QuizAnswer> hasSameType(QuizType type) {
+        return answer -> answer.getQuestion().getQuizType() == type;
     }
 
-    private List<QuizAnswer> convertAnswersToEntities(List<QuizAnswerDto> dtoList) {
+    private void saveNewAnswers(List<QuizAnswerDto> dtoList, User user) {
         List<QuizAnswer> answerList = dtoList.stream()
-                .map(this::buildQuizAnswer)
+                .map(dto -> buildQuizAnswer(dto, user))
                 .toList();
 
-        return quizRepository.saveAll(answerList);
+        quizRepository.saveAll(answerList);
     }
 
-    private QuizAnswer buildQuizAnswer(QuizAnswerDto dto) {
-        Question question = questionRepository.findById(dto.getQuestionId())
-                .orElseThrow();
-        Answer answer = answerRepository.findById(dto.getAnswerId())
-                .orElseThrow();
+    private QuizAnswer buildQuizAnswer(QuizAnswerDto dto, User user) {
+        Question question = findQuestionByIdOrException(dto.getQuestionId());
+        Answer answer = findAnswerByIdOrException(dto.getAnswerId());
+
         return QuizAnswer.builder()
+                .user(user)
                 .question(question)
                 .answer(answer)
                 .build();
+    }
+
+    private Consumer<QuizAnswer> checkIdAndModify(QuizAnswerDto answerDto) {
+        return quizAnswer -> {
+            if (doNotMatch(quizAnswer, answerDto)) {
+                return;
+            }
+            quizAnswer.setAnswer(findAnswerByIdOrException(answerDto.getAnswerId()));
+        };
     }
 
     private User findUserOrException(Long id) {
@@ -76,22 +78,14 @@ public class QuizService {
                 .orElseThrow(() -> new UserNotFoundException("no user with id " + id));
     }
 
-    private Answer findAnswerOrException(Long id) {
+    private Answer findAnswerByIdOrException(Long id) {
         return answerRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchEntityException("No answer with id = " + id));
     }
 
-    private Function<QuizAnswer, QuizAnswer> answerByIdReplacer(QuizAnswerDto answerDto) {
-        return answer -> {
-            if (doNotMatch(answer, answerDto)) {
-                return answer;
-            }
-            Answer newAnswer = findAnswerOrException(answerDto.getAnswerId());
-            return QuizAnswer.builder()
-                    .question(answer.getQuestion())
-                    .answer(newAnswer)
-                    .build();
-        };
+    private Question findQuestionByIdOrException(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new NoSuchEntityException("No question with id =" + id));
     }
 
     private boolean doNotMatch(QuizAnswer answer, QuizAnswerDto answerDto) {

@@ -18,15 +18,15 @@ public class QuizAnswer {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(orphanRemoval = true)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToOne(orphanRemoval = true)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
