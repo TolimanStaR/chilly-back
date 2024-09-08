@@ -11,6 +11,7 @@ security:
   jwt:
     secret-key: "${JWT_SECRET_KEY}"
     expiration-time: 86400000
+  api-key: "${API_KEY}"
 
 http:
   headers:

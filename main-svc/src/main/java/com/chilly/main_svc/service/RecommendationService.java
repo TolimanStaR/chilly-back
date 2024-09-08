@@ -5,7 +5,6 @@ import com.chilly.main_svc.dto.PredictionInput;
 import com.chilly.main_svc.dto.QuizAnswerForRecDto;
 import com.chilly.main_svc.exception.CallFailedException;
 import com.chilly.main_svc.exception.QuizNotFilledException;
-import com.chilly.main_svc.exception.UserNotFoundException;
 import com.chilly.main_svc.mapper.PlaceDtoMapper;
 import com.chilly.main_svc.mapper.UserDtoModelMapper;
 import com.chilly.main_svc.model.Place;
@@ -13,7 +12,6 @@ import com.chilly.main_svc.model.QuizAnswer;
 import com.chilly.main_svc.model.QuizType;
 import com.chilly.main_svc.model.User;
 import com.chilly.main_svc.repository.PlaceRepository;
-import com.chilly.main_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -29,7 +27,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 @Slf4j
 public class RecommendationService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PlaceRepository placeRepository;
     private final UserDtoModelMapper userMapper;
     private final PlaceDtoMapper placeMapper;
@@ -38,8 +36,7 @@ public class RecommendationService {
     private static final ParameterizedTypeReference<List<Long>> LONG_LIST_TYPE_REF = new ParameterizedTypeReference<>() {};
 
     public List<PlaceDto> getRecommendations(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("no user with id = " + userId));
+        User user = userService.findUserOrException(userId);
 
         Set<QuizAnswer> userAnswers = user.getQuizAnswers();
         log.info("user has {} saved quiz answers", userAnswers.size());
@@ -60,13 +57,14 @@ public class RecommendationService {
                 .baseQuizAnswers(baseAnswers)
                 .build();
 
+        log.info("built prediction input: {}", input);
         List<Long> placesIds;
         try {
             placesIds = callPredictionService(input);
         } catch (Exception e) {
             throw new CallFailedException("recommendations unavailable");
         }
-
+        log.info("predicted ids: {}", placesIds);
         List<Place> places = placeRepository.findAllByIdIn(placesIds);
         return places.stream()
                 .map(placeMapper::toDto)

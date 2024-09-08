@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Tag(name = "Places", description = "Places related API")
-@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/api/places")
 @RequiredArgsConstructor
@@ -25,14 +24,23 @@ public class PlaceController {
     @Operation(summary = "save all listed places")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @SecurityRequirement(name = "Bearer Authentication")
     @Transactional
     public void savePlaces(@RequestBody List<PlaceDto> placeDtoList) {
         placeService.savePlaces(placeDtoList);
     }
 
     @Operation(summary = "lists all known places")
+    @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping
     public List<PlaceDto> getAllPlaces() {
         return placeService.getAllPlaces();
+    }
+
+    @Operation(summary = "find all places from list of ids")
+    @SecurityRequirement(name = "Api key")
+    @GetMapping("ids")
+    public List<PlaceDto> getPlacesByIds(@RequestBody List<Long> ids) {
+        return placeService.getPlacesByIds(ids);
     }
 }

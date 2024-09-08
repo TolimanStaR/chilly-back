@@ -28,4 +28,11 @@ public class PlaceService {
                 .map(placeMapper::toDto)
                 .toList();
     }
+
+    public List<PlaceDto> getPlacesByIds(List<Long> ids) {
+        return placeRepository.findAllByIdIn(ids)
+                .stream()
+                .map(placeMapper::toDto)
+                .toList();
+    }
 }

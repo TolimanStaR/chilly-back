@@ -11,8 +11,6 @@ services:
     restart: unless-stopped
     command:
       - "-p ${MAIN_DB_PORT}"
-    ports:
-      - "${MAIN_DB_PORT}:${MAIN_DB_PORT}"
     networks:
       - chilly-net
     healthcheck:
@@ -117,6 +115,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+      API_KEY: "${API_KEY}"
     networks:
       - chilly-net
     healthcheck:

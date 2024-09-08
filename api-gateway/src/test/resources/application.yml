@@ -2,6 +2,7 @@ security:
   jwt:
     secret-key: test-key
     expiration-time: 0
+  api-key: some-key
 
 http:
   headers:

@@ -59,7 +59,12 @@ public class JwtAuthFilter implements GatewayFilter {
     }
 
     private String getAuthToken(ServerHttpRequest request) {
-        String value = request.getHeaders().getOrEmpty("Authorization").get(0);
+        String value;
+        try {
+            value = request.getHeaders().getOrEmpty("Authorization").get(0);
+        } catch (Exception e) {
+            return null;
+        }
         if (!value.startsWith("Bearer ")) {
             return null;
         }

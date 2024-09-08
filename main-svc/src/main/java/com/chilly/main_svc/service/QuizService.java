@@ -3,12 +3,10 @@ package com.chilly.main_svc.service;
 import com.chilly.main_svc.dto.QuizAnswerDto;
 import com.chilly.main_svc.dto.QuizAnswersDto;
 import com.chilly.main_svc.exception.NoSuchEntityException;
-import com.chilly.main_svc.exception.UserNotFoundException;
 import com.chilly.main_svc.model.*;
 import com.chilly.main_svc.repository.AnswerRepository;
 import com.chilly.main_svc.repository.QuestionRepository;
 import com.chilly.main_svc.repository.QuizRepository;
-import com.chilly.main_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +20,12 @@ import java.util.function.Predicate;
 public class QuizService {
 
     private final QuizRepository quizRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
 
     public void submitAnswers(Long userId, QuizAnswersDto answersDto) {
-        User user = findUserOrException(userId);
+        User user = userService.findUserOrException(userId);
         List<QuizAnswer> answersToRemove = user.getQuizAnswers().stream()
                 .filter(hasSameType(answersDto.getType()))
                 .toList();
@@ -37,7 +35,7 @@ public class QuizService {
     }
 
     public void modifyAnswer(Long userId, QuizAnswerDto answerDto) {
-        User user = findUserOrException(userId);
+        User user = userService.findUserOrException(userId);
         user.getQuizAnswers().forEach(checkIdAndModify(answerDto));
     }
 
@@ -71,11 +69,6 @@ public class QuizService {
             }
             quizAnswer.setAnswer(findAnswerByIdOrException(answerDto.getAnswerId()));
         };
-    }
-
-    private User findUserOrException(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("no user with id " + id));
     }
 
     private Answer findAnswerByIdOrException(Long id) {

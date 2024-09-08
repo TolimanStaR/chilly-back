@@ -1,9 +1,6 @@
 package com.chilly.security_svc.controller;
 
-import com.chilly.security_svc.dto.LoginRequest;
-import com.chilly.security_svc.dto.RefreshRequest;
-import com.chilly.security_svc.dto.RegisterRequest;
-import com.chilly.security_svc.dto.TokenResponse;
+import com.chilly.security_svc.dto.*;
 import com.chilly.security_svc.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,5 +39,12 @@ public class AuthController {
     @Transactional
     public TokenResponse refresh(@RequestBody RefreshRequest request) {
         return authService.refresh(request);
+    }
+
+    @Operation(summary = "change either email or phone number of logged-in user")
+    @PutMapping("username")
+    @Transactional
+    public void changeLogin(@RequestHeader("UserId") Long userId, @RequestBody LoginInfoChangeRequest request) {
+        authService.changeUsername(userId, request);
     }
 }

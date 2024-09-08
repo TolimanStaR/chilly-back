@@ -88,7 +88,7 @@ public class AuthService {
 
     private void sendUserDtoToMainService(UserDto dto) {
         webClient.post()
-                .uri("http://main-svc/api/user")
+                .uri("http://main-svc/api/user/internal")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .retrieve()
@@ -111,5 +111,48 @@ public class AuthService {
         final String accessToken = jwtService.generateToken(user, user.getId());
         final String refreshToken = refreshTokenService.generateRefreshToken(user);
         return new TokenResponse(accessToken, refreshToken);
+    }
+
+    public void changeUsername(Long userId, LoginInfoChangeRequest request) {
+        if (!checkUniqueEmail(request.getEmail())) {
+            throw new UserAlreadyExitsException("email " + request.getEmail() + " already in use");
+        }
+        if (!checkUniquePhone(request.getPhone())) {
+            throw new UserAlreadyExitsException("phone " + request.getEmail() + " already in use");
+        }
+
+        try {
+            changeInfoInMainService(convertToInternal(userId, request));
+        }
+        catch (Exception e) {
+            throw new UserNotSavedError("request to main service failed");
+        }
+    }
+
+    private void changeInfoInMainService( LoginInfoChangeInternalRequest request) {
+        webClient.put()
+                .uri("http://main-svc/api/user/internal/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    private LoginInfoChangeInternalRequest convertToInternal(Long userId, LoginInfoChangeRequest request) {
+        return LoginInfoChangeInternalRequest.builder()
+                .id(userId)
+                .phone(request.getPhone())
+                .email(request.getEmail())
+                .build();
+    }
+
+
+    private boolean checkUniqueEmail(String email) {
+        return email != null && userRepository.findByEmail(email).isEmpty();
+    }
+
+    private boolean checkUniquePhone(String phone) {
+        return phone != null && userRepository.findByPhoneNumber(phone).isEmpty();
     }
 }

@@ -1,6 +1,8 @@
 package com.chilly.main_svc.service;
 
+import com.chilly.main_svc.dto.LoginInfoChangeRequest;
 import com.chilly.main_svc.dto.UserDto;
+import com.chilly.main_svc.exception.UserNotFoundException;
 import com.chilly.main_svc.mapper.UserDtoModelMapper;
 import com.chilly.main_svc.model.User;
 import com.chilly.main_svc.repository.UserRepository;
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +32,32 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    public UserDto getUserById(Long userId) {
+        return userMapper.toDto(findUserOrException(userId));
+    }
+
+    public void changeUser(Long userId, UserDto newInfo) {
+        User user = findUserOrException(userId);
+        checkAndChange(newInfo.getFirstname(), user.getFirstname(), user::setFirstname);
+        checkAndChange(newInfo.getLastname(), user.getLastname(), user::setLastname);
+    }
+
+    public void changeLoginInfo(LoginInfoChangeRequest request) {
+        User user = findUserOrException(request.getId());
+        checkAndChange(request.getEmail(), user.getEmail(), user::setEmail);
+        checkAndChange(request.getPhone(), user.getPhoneNumber(), user::setPhoneNumber);
+    }
+
+    public User findUserOrException(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("No user with id = " + id));
+    }
+
+    private <T> void checkAndChange(T value, T oldValue, Consumer<T> setter) {
+        if (value != null && oldValue != value) {
+            setter.accept(value);
+        }
     }
 }
