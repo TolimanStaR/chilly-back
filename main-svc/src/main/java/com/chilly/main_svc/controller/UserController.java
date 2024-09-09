@@ -1,5 +1,6 @@
 package com.chilly.main_svc.controller;
 
+import com.chilly.main_svc.dto.ChangeInfoRequest;
 import com.chilly.main_svc.dto.LoginInfoChangeRequest;
 import com.chilly.main_svc.dto.UserDto;
 import com.chilly.main_svc.service.UserService;
@@ -32,7 +33,7 @@ public class UserController {
     @Operation(summary = "change info about logged user")
     @PutMapping("me")
     @Transactional
-    public void changeUserInfo(@RequestHeader("UserId") Long userId, @RequestBody UserDto newInfo) {
+    public void changeUserInfo(@RequestHeader("UserId") Long userId, @RequestBody ChangeInfoRequest newInfo) {
         userService.changeUser(userId, newInfo);
     }
 

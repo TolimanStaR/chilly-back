@@ -1,5 +1,6 @@
 package com.chilly.main_svc.service;
 
+import com.chilly.main_svc.dto.ChangeInfoRequest;
 import com.chilly.main_svc.dto.LoginInfoChangeRequest;
 import com.chilly.main_svc.dto.UserDto;
 import com.chilly.main_svc.exception.UserNotFoundException;
@@ -38,7 +39,7 @@ public class UserService {
         return userMapper.toDto(findUserOrException(userId));
     }
 
-    public void changeUser(Long userId, UserDto newInfo) {
+    public void changeUser(Long userId, ChangeInfoRequest newInfo) {
         User user = findUserOrException(userId);
         checkAndChange(newInfo.getFirstname(), user.getFirstname(), user::setFirstname);
         checkAndChange(newInfo.getLastname(), user.getLastname(), user::setLastname);
