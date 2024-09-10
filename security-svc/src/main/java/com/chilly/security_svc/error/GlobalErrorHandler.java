@@ -47,9 +47,19 @@ public class GlobalErrorHandler {
         return wrapException(HttpStatus.BAD_REQUEST, error);
     }
 
+    @ExceptionHandler(NoDataProvidedException.class)
+    public ResponseEntity<ErrorResponse> handle(NoDataProvidedException error) {
+        return wrapException(HttpStatus.BAD_REQUEST, error);
+    }
+
     @ExceptionHandler(CannotRecoverPasswordException.class)
     public ResponseEntity<ErrorResponse> handle(CannotRecoverPasswordException error) {
         return wrapException(HttpStatus.BAD_REQUEST, error);
+    }
+
+    @ExceptionHandler(NoSuchEntityException.class)
+    public ResponseEntity<ErrorResponse> handle(NoSuchEntityException error) {
+        return wrapException(HttpStatus.NOT_FOUND, error);
     }
 
     private ResponseEntity<ErrorResponse> wrapException(HttpStatus status, Exception exception) {

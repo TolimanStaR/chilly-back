@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.function.Consumer;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -114,18 +116,33 @@ public class AuthService {
     }
 
     public void changeUsername(Long userId, LoginInfoChangeRequest request) {
+        if (request.getPhone() == null && request.getEmail() == null) {
+            throw new NoDataProvidedException("email or phone need to be specified");
+        }
         if (!checkUniqueEmail(request.getEmail())) {
             throw new UserAlreadyExitsException("email " + request.getEmail() + " already in use");
         }
         if (!checkUniquePhone(request.getPhone())) {
-            throw new UserAlreadyExitsException("phone " + request.getEmail() + " already in use");
+            throw new UserAlreadyExitsException("phone " + request.getPhone() + " already in use");
         }
+
+        User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NoSuchEntityException("no user with id = " + userId));
+
+        checkAndChange(request.getEmail(), user.getEmail(), user::setEmail);
+        checkAndChange(request.getPhone(), user.getPhoneNumber(), user::setPhoneNumber);
 
         try {
             changeInfoInMainService(convertToInternal(userId, request));
         }
         catch (Exception e) {
             throw new UserNotSavedError("request to main service failed");
+        }
+    }
+
+    private void checkAndChange(String newValue, String oldValue, Consumer<String> setter) {
+        if (newValue != null && !newValue.equals(oldValue)) {
+            setter.accept(newValue);
         }
     }
 
@@ -149,10 +166,10 @@ public class AuthService {
 
 
     private boolean checkUniqueEmail(String email) {
-        return email != null && userRepository.findByEmail(email).isEmpty();
+        return email == null || userRepository.findByEmail(email).isEmpty();
     }
 
     private boolean checkUniquePhone(String phone) {
-        return phone != null && userRepository.findByPhoneNumber(phone).isEmpty();
+        return phone == null || userRepository.findByPhoneNumber(phone).isEmpty();
     }
 }
