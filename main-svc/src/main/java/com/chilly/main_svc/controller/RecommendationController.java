@@ -22,7 +22,7 @@ public class RecommendationController {
 
     @Operation(summary = "returns predicted places for user")
     @SecurityRequirement(name = "Bearer Authentication")
-    @GetMapping("res")
+    @GetMapping("recs")
     public List<PlaceDto> getRecommendations(
             @RequestHeader(value = "UserId", required = false) Long userId
     ) {
