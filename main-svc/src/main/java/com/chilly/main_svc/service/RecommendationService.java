@@ -2,8 +2,9 @@ package com.chilly.main_svc.service;
 
 import com.chilly.main_svc.dto.PlaceDto;
 import com.chilly.main_svc.dto.PredictionInput;
-import com.chilly.main_svc.dto.QuizAnswerDto;
-import com.chilly.main_svc.exception.UserNotFoundException;
+import com.chilly.main_svc.dto.QuizAnswerForRecDto;
+import com.chilly.main_svc.exception.CallFailedException;
+import com.chilly.main_svc.exception.QuizNotFilledException;
 import com.chilly.main_svc.mapper.PlaceDtoMapper;
 import com.chilly.main_svc.mapper.UserDtoModelMapper;
 import com.chilly.main_svc.model.Place;
@@ -11,8 +12,8 @@ import com.chilly.main_svc.model.QuizAnswer;
 import com.chilly.main_svc.model.QuizType;
 import com.chilly.main_svc.model.User;
 import com.chilly.main_svc.repository.PlaceRepository;
-import com.chilly.main_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,9 @@ import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PlaceRepository placeRepository;
     private final UserDtoModelMapper userMapper;
     private final PlaceDtoMapper placeMapper;
@@ -34,12 +36,20 @@ public class RecommendationService {
     private static final ParameterizedTypeReference<List<Long>> LONG_LIST_TYPE_REF = new ParameterizedTypeReference<>() {};
 
     public List<PlaceDto> getRecommendations(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("no user with id = " + userId));
+        User user = userService.findUserOrException(userId);
 
         Set<QuizAnswer> userAnswers = user.getQuizAnswers();
-        List<QuizAnswerDto> shortAnswers = filterAndMapAnswers(userAnswers, QuizType.SHORT);
-        List<QuizAnswerDto> baseAnswers = filterAndMapAnswers(userAnswers, QuizType.BASE);
+        log.info("user has {} saved quiz answers", userAnswers.size());
+
+        List<QuizAnswerForRecDto> shortAnswers = filterAndMapAnswers(userAnswers, QuizType.SHORT);
+        List<QuizAnswerForRecDto> baseAnswers = filterAndMapAnswers(userAnswers, QuizType.BASE);
+
+        if (shortAnswers.isEmpty()) {
+            throw new QuizNotFilledException("short quiz is not filled");
+        }
+        if (baseAnswers.isEmpty()) {
+            throw new QuizNotFilledException("base quiz is not filled");
+        }
 
         PredictionInput input = PredictionInput.builder()
                 .user(userMapper.toDto(user))
@@ -47,8 +57,14 @@ public class RecommendationService {
                 .baseQuizAnswers(baseAnswers)
                 .build();
 
-        List<Long> placesIds = callPredictionService(input);
-
+        log.info("built prediction input: {}", input);
+        List<Long> placesIds;
+        try {
+            placesIds = callPredictionService(input);
+        } catch (Exception e) {
+            throw new CallFailedException("recommendations unavailable");
+        }
+        log.info("predicted ids: {}", placesIds);
         List<Place> places = placeRepository.findAllByIdIn(placesIds);
         return places.stream()
                 .map(placeMapper::toDto)
@@ -59,11 +75,11 @@ public class RecommendationService {
         return answer -> answer.getQuestion().getQuizType() == type;
     }
 
-    private QuizAnswerDto quizAnswerToDto(QuizAnswer answer) {
-        return new QuizAnswerDto(answer.getQuestion().getId(), answer.getId());
+    private QuizAnswerForRecDto quizAnswerToDto(QuizAnswer answer) {
+        return new QuizAnswerForRecDto(answer.getAnswer().getBody(), answer.getQuestion().getIndex());
     }
 
-    private List<QuizAnswerDto> filterAndMapAnswers(Set<QuizAnswer> answers, QuizType type) {
+    private List<QuizAnswerForRecDto> filterAndMapAnswers(Set<QuizAnswer> answers, QuizType type) {
         return answers.stream()
                 .filter(hasQuizType(type))
                 .map(this::quizAnswerToDto)

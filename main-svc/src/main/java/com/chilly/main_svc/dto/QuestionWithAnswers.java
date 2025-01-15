@@ -13,5 +13,6 @@ import java.util.List;
 @Builder
 public class QuestionWithAnswers {
     private String questionText;
+    private Integer questionIndex;
     private List<String> answers;
 }

@@ -28,6 +28,9 @@ public class Question {
     @Column(name = "body")
     private String body;
 
+    @Column(name = "index")
+    private Integer index;
+
     @OneToMany(mappedBy = "question", orphanRemoval = true)
     @Builder.Default
     private Set<Answer> answers = new LinkedHashSet<>();

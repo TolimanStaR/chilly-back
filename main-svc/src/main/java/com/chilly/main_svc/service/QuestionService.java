@@ -44,22 +44,24 @@ public class QuestionService {
                 .orElseThrow();
         
         question.setBody(newQuestion.getQuestionText());
+        question.setIndex(newQuestion.getQuestionIndex());
         question.setAnswers(saveAnswers(newQuestion.getAnswers()));
     }
 
     private void saveQuestionWithAnswers(QuestionWithAnswers questionWithAnswers, QuizType type) {
-        Question question = saveQuestion(questionWithAnswers.getQuestionText(), type);
+        Question question = saveQuestion(questionWithAnswers, type);
         List<Answer> answers = questionWithAnswers.getAnswers().stream()
                 .map(answerText -> buildAnswer(question, answerText))
                 .toList();
         answerRepository.saveAll(answers);
     }
 
-    private Question saveQuestion(String text, QuizType type) {
+    private Question saveQuestion(QuestionWithAnswers question, QuizType type) {
         return questionRepository.save(
                 Question.builder()
                         .quizType(type)
-                        .body(text)
+                        .body(question.getQuestionText())
+                        .index(question.getQuestionIndex())
                         .build()
         );
     }

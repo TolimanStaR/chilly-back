@@ -17,8 +17,6 @@ import java.util.Set;
 @Builder
 public class Place {
     @Id
-    @SequenceGenerator(name = "place_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "place_sequence")
     @Column(name = "id")
     private Long id;
 
@@ -45,7 +43,8 @@ public class Place {
     private String phone;
 
     @Column(name = "social")
-    private String social;
+    @Convert(converter = ListToStringConverter.class)
+    private List<String> social;
 
     @Column(name = "open_hours")
     @Convert(converter = ListToStringConverter.class)

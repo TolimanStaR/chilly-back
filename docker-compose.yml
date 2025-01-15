@@ -96,6 +96,8 @@ services:
       SEC_DB_PORT: "${SEC_DB_PORT}"
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+      EMAIL_USERNAME: "${EMAIL_USERNAME}"
+      EMAIL_PASSWORD: "${EMAIL_PASSWORD}"
     networks:
       - chilly-net
 
@@ -113,6 +115,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+      API_KEY: "${API_KEY}"
     networks:
       - chilly-net
     healthcheck:

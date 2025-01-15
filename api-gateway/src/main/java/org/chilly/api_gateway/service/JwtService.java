@@ -2,6 +2,7 @@ package org.chilly.api_gateway.service;
 
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -28,7 +29,12 @@ public class JwtService {
     }
 
     public boolean isNotValid(String token) {
-        return isExpired(token);
+        try {
+            return isExpired(token);
+        }
+        catch (ExpiredJwtException exception) {
+            return true;
+        }
     }
 
     private Date extractExpiration(String token) {

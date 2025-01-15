@@ -13,6 +13,6 @@ import java.util.List;
 @Builder
 public class PredictionInput {
     private UserDto user;
-    private List<QuizAnswerDto> shortQuizAnswers;
-    private List<QuizAnswerDto> baseQuizAnswers;
+    private List<QuizAnswerForRecDto> shortQuizAnswers;
+    private List<QuizAnswerForRecDto> baseQuizAnswers;
 }

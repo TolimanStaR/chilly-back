@@ -1,10 +1,7 @@
 package com.chilly.security_svc.service;
 
 import com.chilly.security_svc.dto.*;
-import com.chilly.security_svc.error.ExpiredRefreshTokenException;
-import com.chilly.security_svc.error.NoUserForRefreshTokenException;
-import com.chilly.security_svc.error.UserNotSavedError;
-import com.chilly.security_svc.error.NoUsernameProvidedException;
+import com.chilly.security_svc.error.*;
 import com.chilly.security_svc.model.RefreshToken;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
@@ -16,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +30,16 @@ public class AuthService {
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
-        if (request.getPhoneNumber() == null && request.getEmail() == null) {
-            throw new NoUsernameProvidedException("to be registered user should have either phone or email");
+        if (request.getPhoneNumber() == null || request.getEmail() == null) {
+            throw new NoUsernameProvidedException("to be registered user should have phone and email");
+        }
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new UserAlreadyExitsException("email already in use");
+        }
+
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
+            throw new UserAlreadyExitsException("phone number already in use");
         }
 
         User user = userRepository.save(buildUserFromRequest(request));
@@ -83,7 +90,7 @@ public class AuthService {
 
     private void sendUserDtoToMainService(UserDto dto) {
         webClient.post()
-                .uri("http://main-svc/api/user")
+                .uri("http://main-svc/api/user/internal")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .retrieve()
@@ -106,5 +113,63 @@ public class AuthService {
         final String accessToken = jwtService.generateToken(user, user.getId());
         final String refreshToken = refreshTokenService.generateRefreshToken(user);
         return new TokenResponse(accessToken, refreshToken);
+    }
+
+    public void changeUsername(Long userId, LoginInfoChangeRequest request) {
+        if (request.getPhone() == null && request.getEmail() == null) {
+            throw new NoDataProvidedException("email or phone need to be specified");
+        }
+        if (!checkUniqueEmail(request.getEmail())) {
+            throw new UserAlreadyExitsException("email " + request.getEmail() + " already in use");
+        }
+        if (!checkUniquePhone(request.getPhone())) {
+            throw new UserAlreadyExitsException("phone " + request.getPhone() + " already in use");
+        }
+
+        User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NoSuchEntityException("no user with id = " + userId));
+
+        checkAndChange(request.getEmail(), user.getEmail(), user::setEmail);
+        checkAndChange(request.getPhone(), user.getPhoneNumber(), user::setPhoneNumber);
+
+        try {
+            changeInfoInMainService(convertToInternal(userId, request));
+        }
+        catch (Exception e) {
+            throw new UserNotSavedError("request to main service failed");
+        }
+    }
+
+    private void checkAndChange(String newValue, String oldValue, Consumer<String> setter) {
+        if (newValue != null && !newValue.equals(oldValue)) {
+            setter.accept(newValue);
+        }
+    }
+
+    private void changeInfoInMainService( LoginInfoChangeInternalRequest request) {
+        webClient.put()
+                .uri("http://main-svc/api/user/internal/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    private LoginInfoChangeInternalRequest convertToInternal(Long userId, LoginInfoChangeRequest request) {
+        return LoginInfoChangeInternalRequest.builder()
+                .id(userId)
+                .phone(request.getPhone())
+                .email(request.getEmail())
+                .build();
+    }
+
+
+    private boolean checkUniqueEmail(String email) {
+        return email == null || userRepository.findByEmail(email).isEmpty();
+    }
+
+    private boolean checkUniquePhone(String phone) {
+        return phone == null || userRepository.findByPhoneNumber(phone).isEmpty();
     }
 }

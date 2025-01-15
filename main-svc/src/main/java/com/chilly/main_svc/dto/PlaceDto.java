@@ -19,6 +19,6 @@ public class PlaceDto implements Serializable {
     Double rating;
     List<String> images;
     String phone;
-    String social;
+    List<String> social;
     List<String> openHours;
 }

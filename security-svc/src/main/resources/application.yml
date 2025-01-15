@@ -17,6 +17,22 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  mail:
+    host: smtp.mail.ru
+    port: 465
+    username: "${EMAIL_USERNAME}"
+    password: "${EMAIL_PASSWORD}"
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          transport:
+            protocol: smtp
+          ssl:
+            enable: true
+
+
 server:
   port: 0
 
