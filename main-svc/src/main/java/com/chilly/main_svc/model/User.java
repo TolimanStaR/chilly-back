@@ -34,9 +34,4 @@ public class User {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     @Builder.Default
     private Set<QuizAnswer> quizAnswers = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    @Builder.Default
-    private Set<Visit> visits = new LinkedHashSet<>();
-
 }
