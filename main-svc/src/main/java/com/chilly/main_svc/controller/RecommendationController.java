@@ -29,6 +29,8 @@ public class RecommendationController {
         return recommendationService.getRecommendations(userId);
     }
 
+    // this end-point is a surrogate because python service doesn't expose documentation to swagger
+    // actual call to /api/prediction is redirected to rec-svc at gateway
     @Operation(summary = "direct call to recommendation service")
     @SecurityRequirement(name = "Api key")
     @PostMapping("prediction")

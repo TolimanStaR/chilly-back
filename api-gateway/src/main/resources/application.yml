@@ -29,5 +29,7 @@ springdoc:
         name: Main Service
       - url: /security-svc/v3/api-docs
         name: Security Service
+      - url: /places-svc/v3/api-docs
+        name: Places Service
   api-docs:
     enabled: true
