@@ -121,6 +121,27 @@ services:
     networks:
       - chilly-net
 
+  places:
+    depends_on:
+      places_db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    image: "tolimanstar/chilly_places:latest"
+    build:
+      context: ./
+      dockerfile: ./places-svc/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PLACE_DB: "${PLACE_DB}"
+      PLACE_HOST: places_db
+      PLACE_USER: "${PLACE_USER}"
+      PLACE_PASSWORD: "${PLACE_PASSWORD}"
+      PLACE_DB_PORT: "${PLACE_DB_PORT}"
+      GATEWAY_PORT: "${GATEWAY_PORT}"
+    networks:
+      - chilly-net
+
   gateway:
     depends_on:
       eureka:
