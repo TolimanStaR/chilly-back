@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: places-svc
+
+  datasource:
+    url: "jdbc:postgresql://${PLACE_HOST}:${PLACE_DB_PORT}/${PLACE_DB}" # host = localhost, db = places
+    username: "${PLACE_USER}" # user = main_user
+    password: "${PLACE_PASSWORD}" # password = main_password
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    baseline-on-migrate: true
+
+  jpa:
+    show-sql: false
+    database: postgresql
+    hibernate:
+      ddl-auto: validate
+      dialect:
+        PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 0
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+springdoc:
+  swagger-ui:
+    try-it-out-enabled: true
+    operations-sorter: method
+    path: /places-svc/swagger-ui.html
+    url: http://localhost:${GATEWAY_PORT}
+  api-docs:
+    path: /places-svc/v3/api-docs

@@ -40,6 +40,26 @@ services:
       retries: 5
       start_period: 7s
 
+  places_db:
+    image: postgres:alpine
+    volumes:
+      - places_pg_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "${PLACE_DB}"
+      POSTGRES_USER: "${PLACE_USER}"
+      POSTGRES_PASSWORD: "${PLACE_PASSWORD}"
+    restart: unless-stopped
+    command:
+      - "-p ${PLACE_DB_PORT}"
+    networks:
+      - chilly-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${PLACE_USER} -d ${PLACE_DB} -p ${PLACE_DB_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 7s
+
   eureka:
     image: "tolimanstar/chilly_discovery_server:latest"
     build:
@@ -139,6 +159,7 @@ services:
 volumes:
   main_pg_volume:
   security_pg_volume:
+  places_pg_volume:
 
 networks:
   chilly-net: {}
