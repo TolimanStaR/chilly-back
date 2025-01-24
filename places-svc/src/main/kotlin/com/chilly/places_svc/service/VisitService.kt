@@ -1,10 +1,12 @@
 package com.chilly.places_svc.service
 
-import com.chilly.places_svc.dto.SaveVisitRequest
 import com.chilly.places_svc.mapper.VisitMapper
 import com.chilly.places_svc.model.Visit
 import com.chilly.places_svc.repository.PlaceRepository
 import com.chilly.places_svc.repository.VisitRepository
+import org.chilly.common.dto.SaveVisitRequest
+import org.chilly.common.exception.AccessDeniedException
+import org.chilly.common.exception.NoSuchEntityException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
@@ -35,16 +37,15 @@ class VisitService(
         val visit = findVisitOrException(visitId)
 
         if (visit.userId != userId) {
-            // TODO create correct exception type
-            throw RuntimeException("cannot remove visit from another user")
+            throw AccessDeniedException("cannot remove visit from another user")
         }
 
         visitRepository.deleteById(visitId)
     }
 
     private fun findPlaceOrException(id: Long) = placeRepository.findByIdOrNull(id)
-        ?: throw NoSuchElementException("No place with id=$id")
+        ?: throw NoSuchEntityException("No place with id=$id")
 
     private fun findVisitOrException(id: Long) = visitRepository.findByIdOrNull(id)
-        ?: throw NoSuchElementException("No visit with id=$id")
+        ?: throw NoSuchEntityException("No visit with id=$id")
 }

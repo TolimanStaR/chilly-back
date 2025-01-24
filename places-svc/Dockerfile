@@ -1,5 +1,10 @@
 FROM maven:3.8.5-openjdk-17 AS build
 COPY pom.xml /app/pom.xml
+
+COPY common/pom.xml /app/common/pom.xml
+COPY common/src /app/common/src
+RUN mvn -f /app/common/pom.xml clean install
+
 COPY places-svc/pom.xml /app/module/pom.xml
 RUN mvn -f /app/module/pom.xml verify --fail-never
 

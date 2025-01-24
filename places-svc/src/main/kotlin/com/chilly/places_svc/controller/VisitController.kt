@@ -1,10 +1,10 @@
 package com.chilly.places_svc.controller
 
-import com.chilly.places_svc.dto.SaveVisitRequest
-import com.chilly.places_svc.dto.VisitDto
 import com.chilly.places_svc.service.VisitService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.chilly.common.dto.SaveVisitRequest
+import org.chilly.common.dto.VisitDto
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Visits", description = "Visit related API")

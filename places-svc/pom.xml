@@ -78,6 +78,12 @@
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.chilly</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
