@@ -20,6 +20,7 @@
         <module>discovery-server</module>
         <module>api-gateway</module>
         <module>places-svc</module>
+        <module>common</module>
     </modules>
 
     <properties>
