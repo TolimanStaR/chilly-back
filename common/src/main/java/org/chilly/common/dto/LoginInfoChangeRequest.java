@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class LoginInfoChangeRequest {
-    private Long id;
     private String email;
     private String phone;
 }

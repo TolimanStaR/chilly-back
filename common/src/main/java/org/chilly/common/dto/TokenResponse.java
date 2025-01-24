@@ -1,5 +1,4 @@
-package com.chilly.security_svc.dto;
-
+package org.chilly.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CodeVerificationResponse {
-    private Boolean verified;
+public class TokenResponse {
+    private String accessToken;
+    private String refreshToken;
 }

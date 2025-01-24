@@ -14,9 +14,12 @@ public class GlobalErrorHandler {
 
     private static final Map<Class<? extends BaseAppException>, HttpStatus> STATUS_CODE_MAPPINGS = Map.ofEntries(
             Map.entry(NoSuchEntityException.class, HttpStatus.NOT_FOUND),
-            Map.entry(CallFailedException.class, HttpStatus.BAD_REQUEST),
+            Map.entry(CallFailedException.class, HttpStatus.SERVICE_UNAVAILABLE),
             Map.entry(EmptyDataException.class, HttpStatus.NOT_ACCEPTABLE),
-            Map.entry(AccessDeniedException.class, HttpStatus.FORBIDDEN)
+            Map.entry(AccessDeniedException.class, HttpStatus.FORBIDDEN),
+            Map.entry(UnauthorizedAccessException.class, HttpStatus.UNAUTHORIZED),
+            Map.entry(EntityExistsException.class, HttpStatus.CONFLICT),
+            Map.entry(WrongDataException.class, HttpStatus.BAD_REQUEST)
     );
 
     @ExceptionHandler(BaseAppException.class)

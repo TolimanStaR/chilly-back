@@ -1,4 +1,4 @@
-package com.chilly.security_svc.dto;
+package org.chilly.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginInfoChangeInternalRequest {
-    private Long id;
+public class RecoveryCodeSendRequest {
     private String email;
-    private String phone;
 }

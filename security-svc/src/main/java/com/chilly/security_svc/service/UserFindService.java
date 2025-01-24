@@ -1,9 +1,9 @@
 package com.chilly.security_svc.service;
 
-import com.chilly.security_svc.error.UserNotFoundException;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.chilly.common.exception.NoSuchEntityException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +27,6 @@ public class UserFindService implements UserDetailsService {
 
     private User loadByEmailOrException(String username) {
         return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UserNotFoundException("no user with phone or email = " + username));
+                .orElseThrow(() -> new NoSuchEntityException("no user with phone or email = " + username));
     }
 }

@@ -6,7 +6,7 @@ import com.chilly.main_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chilly.common.dto.ChangeInfoRequest;
-import org.chilly.common.dto.LoginInfoChangeRequest;
+import org.chilly.common.dto.LoginInfoChangeInternalRequest;
 import org.chilly.common.dto.UserDto;
 import org.chilly.common.exception.NoSuchEntityException;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class UserService {
         checkAndChange(newInfo.getLastname(), user.getLastname(), user::setLastname);
     }
 
-    public void changeLoginInfo(LoginInfoChangeRequest request) {
+    public void changeLoginInfo(LoginInfoChangeInternalRequest request) {
         User user = findUserOrException(request.getId());
         checkAndChange(request.getEmail(), user.getEmail(), user::setEmail);
         checkAndChange(request.getPhone(), user.getPhoneNumber(), user::setPhoneNumber);

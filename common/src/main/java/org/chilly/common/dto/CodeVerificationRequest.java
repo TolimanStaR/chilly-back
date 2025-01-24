@@ -1,4 +1,4 @@
-package com.chilly.security_svc.dto;
+package org.chilly.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDto {
-    private Long id;
-    private String phoneNumber;
+public class CodeVerificationRequest {
     private String email;
-    private String firstname;
-    private String lastname;
+    private String code;
 }

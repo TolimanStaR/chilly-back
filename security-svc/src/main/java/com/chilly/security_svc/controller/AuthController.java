@@ -1,10 +1,10 @@
 package com.chilly.security_svc.controller;
 
-import com.chilly.security_svc.dto.*;
 import com.chilly.security_svc.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.chilly.common.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;

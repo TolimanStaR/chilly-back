@@ -1,15 +1,15 @@
 package com.chilly.security_svc.service;
 
 import com.chilly.security_svc.config.MailConfig;
-import com.chilly.security_svc.dto.*;
-import com.chilly.security_svc.error.CannotRecoverPasswordException;
-import com.chilly.security_svc.error.UnableToSendEmailException;
-import com.chilly.security_svc.error.UserNotFoundException;
-import com.chilly.security_svc.error.WrongPasswordException;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chilly.common.dto.*;
+import org.chilly.common.exception.CallFailedException;
+import org.chilly.common.exception.NoSuchEntityException;
+import org.chilly.common.exception.UnauthorizedAccessException;
+import org.chilly.common.exception.WrongDataException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,10 +31,10 @@ public class PasswordService {
 
     public void changePassword(Long userId, ChangePasswordRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("no user with id = " + userId));
+                .orElseThrow(() -> new NoSuchEntityException("no user with id = " + userId));
 
         if (!encoder.matches(request.getOldPassword(), user.getPassword()))  {
-            throw new WrongPasswordException("wrong password");
+            throw new UnauthorizedAccessException("wrong password");
         }
 
         user.setPassword(encoder.encode(request.getNewPassword()));
@@ -51,7 +51,7 @@ public class PasswordService {
             message.setText(String.format(MailConfig.PASSWORD_RECOVERY_TEXT_TEMPLATE, code));
             mailSender.send(message);
         } catch (Exception e) {
-            throw new UnableToSendEmailException("unable to send email to " + user.getEmail());
+            throw new CallFailedException("unable to send email to " + user.getEmail());
         }
         user.setRecoveryCode(code);
     }
@@ -65,7 +65,7 @@ public class PasswordService {
     public void recoverPassword(PasswordRecoveryRequest request) {
         User user = findUserByEmailOrException(request.getEmail());
         if (!Objects.equals(user.getRecoveryCode(), request.getCode())) {
-            throw new CannotRecoverPasswordException("verification code doesn't match");
+            throw new WrongDataException("verification code doesn't match");
         }
 
         user.setPassword(encoder.encode(request.getNewPassword()));
@@ -74,7 +74,7 @@ public class PasswordService {
 
     private User findUserByEmailOrException(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("no user with email = " + email));
+                .orElseThrow(() -> new NoSuchEntityException("no user with email = " + email));
     }
 
 }
