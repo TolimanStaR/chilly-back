@@ -1,13 +1,13 @@
 package com.chilly.main_svc.service;
 
-import com.chilly.main_svc.dto.QuizAnswerDto;
-import com.chilly.main_svc.dto.QuizAnswersDto;
-import com.chilly.main_svc.exception.NoSuchEntityException;
 import com.chilly.main_svc.model.*;
 import com.chilly.main_svc.repository.AnswerRepository;
 import com.chilly.main_svc.repository.QuestionRepository;
 import com.chilly.main_svc.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
+import org.chilly.common.dto.QuizAnswerDto;
+import org.chilly.common.dto.QuizAnswersDto;
+import org.chilly.common.exception.NoSuchEntityException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class QuizService {
     public void submitAnswers(Long userId, QuizAnswersDto answersDto) {
         User user = userService.findUserOrException(userId);
         List<QuizAnswer> answersToRemove = user.getQuizAnswers().stream()
-                .filter(hasSameType(answersDto.getType()))
+                .filter(hasSameType(QuizType.valueOf(answersDto.getType())))
                 .toList();
 
         quizRepository.deleteAll(answersToRemove);

@@ -1,7 +1,7 @@
 package com.chilly.main_svc.mapper;
 
-import com.chilly.main_svc.dto.QuestionDto;
 import com.chilly.main_svc.model.Question;
+import org.chilly.common.dto.QuestionDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

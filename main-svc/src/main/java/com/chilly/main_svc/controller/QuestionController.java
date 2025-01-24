@@ -1,14 +1,14 @@
 package com.chilly.main_svc.controller;
 
-import com.chilly.main_svc.dto.QuestionWithAnswers;
-import com.chilly.main_svc.dto.QuizResponse;
-import com.chilly.main_svc.dto.QuizSaveRequest;
 import com.chilly.main_svc.model.QuizType;
 import com.chilly.main_svc.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.chilly.common.dto.QuestionWithAnswers;
+import org.chilly.common.dto.QuizResponse;
+import org.chilly.common.dto.QuizSaveRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;

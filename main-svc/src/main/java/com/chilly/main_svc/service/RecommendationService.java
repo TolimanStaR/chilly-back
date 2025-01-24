@@ -1,16 +1,16 @@
 package com.chilly.main_svc.service;
 
-import com.chilly.main_svc.dto.PlaceDto;
-import com.chilly.main_svc.dto.PredictionInput;
-import com.chilly.main_svc.dto.QuizAnswerForRecDto;
-import com.chilly.main_svc.exception.CallFailedException;
-import com.chilly.main_svc.exception.QuizNotFilledException;
 import com.chilly.main_svc.mapper.UserDtoModelMapper;
 import com.chilly.main_svc.model.QuizAnswer;
 import com.chilly.main_svc.model.QuizType;
 import com.chilly.main_svc.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chilly.common.dto.PlaceDto;
+import org.chilly.common.dto.PredictionInput;
+import org.chilly.common.dto.QuizAnswerForRecDto;
+import org.chilly.common.exception.CallFailedException;
+import org.chilly.common.exception.EmptyDataException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -41,10 +41,10 @@ public class RecommendationService {
         List<QuizAnswerForRecDto> baseAnswers = filterAndMapAnswers(userAnswers, QuizType.BASE);
 
         if (shortAnswers.isEmpty()) {
-            throw new QuizNotFilledException("short quiz is not filled");
+            throw new EmptyDataException("short quiz is not filled");
         }
         if (baseAnswers.isEmpty()) {
-            throw new QuizNotFilledException("base quiz is not filled");
+            throw new EmptyDataException("base quiz is not filled");
         }
 
         PredictionInput input = PredictionInput.builder()

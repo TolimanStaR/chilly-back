@@ -1,14 +1,14 @@
 package com.chilly.main_svc.service;
 
-import com.chilly.main_svc.dto.ChangeInfoRequest;
-import com.chilly.main_svc.dto.LoginInfoChangeRequest;
-import com.chilly.main_svc.dto.UserDto;
-import com.chilly.main_svc.exception.UserNotFoundException;
 import com.chilly.main_svc.mapper.UserDtoModelMapper;
 import com.chilly.main_svc.model.User;
 import com.chilly.main_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chilly.common.dto.ChangeInfoRequest;
+import org.chilly.common.dto.LoginInfoChangeRequest;
+import org.chilly.common.dto.UserDto;
+import org.chilly.common.exception.NoSuchEntityException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class UserService {
 
     public User findUserOrException(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("No user with id = " + id));
+                .orElseThrow(() -> new NoSuchEntityException("No user with id =" + id));
     }
 
     private <T> void checkAndChange(T value, T oldValue, Consumer<T> setter) {

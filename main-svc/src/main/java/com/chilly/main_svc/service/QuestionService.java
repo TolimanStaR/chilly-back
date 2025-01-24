@@ -1,9 +1,5 @@
 package com.chilly.main_svc.service;
 
-import com.chilly.main_svc.dto.QuestionDto;
-import com.chilly.main_svc.dto.QuestionWithAnswers;
-import com.chilly.main_svc.dto.QuizResponse;
-import com.chilly.main_svc.dto.QuizSaveRequest;
 import com.chilly.main_svc.mapper.QuestionDtoMapper;
 import com.chilly.main_svc.model.Answer;
 import com.chilly.main_svc.model.Question;
@@ -12,6 +8,10 @@ import com.chilly.main_svc.repository.AnswerRepository;
 import com.chilly.main_svc.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chilly.common.dto.QuestionDto;
+import org.chilly.common.dto.QuestionWithAnswers;
+import org.chilly.common.dto.QuizResponse;
+import org.chilly.common.dto.QuizSaveRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class QuestionService {
                 .stream()
                 .map(questionMapper::toDto)
                 .toList();
-        return new QuizResponse(type, questionList);
+        return new QuizResponse(type.toString(), questionList);
     }
 
     public void modifyQuestion(Long id, QuestionWithAnswers newQuestion) {
