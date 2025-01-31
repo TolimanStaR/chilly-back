@@ -13,6 +13,8 @@ class PostgresTestContainer private constructor() : PostgreSQLContainer<Postgres
         }
     }
 
+    override fun stop() = Unit
+
     companion object {
         private const val IMAGE_VERSION = "postgres:alpine"
         private const val DATABASE_NAME = "test"
@@ -22,6 +24,7 @@ class PostgresTestContainer private constructor() : PostgreSQLContainer<Postgres
         operator fun invoke(): PostgresTestContainer {
             return container ?: PostgresTestContainer()
                 .withDatabaseName(DATABASE_NAME)
+                .withReuse(true)
                 .also { container = it }
         }
     }

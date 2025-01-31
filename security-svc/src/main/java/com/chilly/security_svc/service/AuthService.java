@@ -47,7 +47,7 @@ public class AuthService {
 
         try {
             sendUserDtoToMainService(dto);
-            log.info("user (id=" + dto.getId() + ") saved");
+            log.info("user (id={}) saved", dto.getId());
         } catch (Exception e) {
             userRepository.deleteById(user.getId());
             throw new CallFailedException("request to main service failed");
@@ -55,6 +55,7 @@ public class AuthService {
     }
 
     public TokenResponse loginUser(LoginRequest request) {
+        // TODO check if user exists
         User authenticatedUser = authenticateUser(request);
         return generateTokensForUser(authenticatedUser);
     }
