@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS visits;
+DROP SEQUENCE IF EXISTS visit_sequence;
+
+DROP TABLE IF EXISTS places;
+DROP SEQUENCE IF EXISTS place_sequence;

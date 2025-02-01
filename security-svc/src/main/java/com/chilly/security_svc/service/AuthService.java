@@ -1,12 +1,12 @@
 package com.chilly.security_svc.service;
 
-import com.chilly.security_svc.dto.*;
-import com.chilly.security_svc.error.*;
 import com.chilly.security_svc.model.RefreshToken;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chilly.common.dto.*;
+import org.chilly.common.exception.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,15 +31,15 @@ public class AuthService {
 
     public void registerUser(RegisterRequest request) {
         if (request.getPhoneNumber() == null || request.getEmail() == null) {
-            throw new NoUsernameProvidedException("to be registered user should have phone and email");
+            throw new EmptyDataException("to be registered user should have phone and email");
         }
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UserAlreadyExitsException("email already in use");
+            throw new EntityExistsException("email already in use");
         }
 
         if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
-            throw new UserAlreadyExitsException("phone number already in use");
+            throw new EntityExistsException("phone number already in use");
         }
 
         User user = userRepository.save(buildUserFromRequest(request));
@@ -47,24 +47,25 @@ public class AuthService {
 
         try {
             sendUserDtoToMainService(dto);
-            log.info("user (id=" + dto.getId() + ") saved");
+            log.info("user (id={}) saved", dto.getId());
         } catch (Exception e) {
             userRepository.deleteById(user.getId());
-            throw new UserNotSavedError("request to main service failed");
+            throw new CallFailedException("request to main service failed");
         }
     }
 
     public TokenResponse loginUser(LoginRequest request) {
+        // TODO check if user exists
         User authenticatedUser = authenticateUser(request);
         return generateTokensForUser(authenticatedUser);
     }
 
     public TokenResponse refresh(RefreshRequest request) {
         RefreshToken refreshToken = refreshTokenService.findByToken(request.getToken())
-                .orElseThrow(() -> new NoUserForRefreshTokenException("no user for token"));
+                .orElseThrow(() -> new UnauthorizedAccessException("no user for token"));
 
         if (refreshTokenService.isExpired(refreshToken)) {
-            throw new ExpiredRefreshTokenException("refresh token is expired");
+            throw new UnauthorizedAccessException("refresh token is expired");
         }
         User user = refreshToken.getUser();
         return generateTokensForUser(user);
@@ -117,13 +118,13 @@ public class AuthService {
 
     public void changeUsername(Long userId, LoginInfoChangeRequest request) {
         if (request.getPhone() == null && request.getEmail() == null) {
-            throw new NoDataProvidedException("email or phone need to be specified");
+            throw new EmptyDataException("email or phone need to be specified");
         }
         if (!checkUniqueEmail(request.getEmail())) {
-            throw new UserAlreadyExitsException("email " + request.getEmail() + " already in use");
+            throw new EntityExistsException("email " + request.getEmail() + " already in use");
         }
         if (!checkUniquePhone(request.getPhone())) {
-            throw new UserAlreadyExitsException("phone " + request.getPhone() + " already in use");
+            throw new EntityExistsException("phone " + request.getPhone() + " already in use");
         }
 
         User user = userRepository.findById(userId)
@@ -136,7 +137,7 @@ public class AuthService {
             changeInfoInMainService(convertToInternal(userId, request));
         }
         catch (Exception e) {
-            throw new UserNotSavedError("request to main service failed");
+            throw new CallFailedException("request to main service failed");
         }
     }
 

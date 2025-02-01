@@ -26,20 +26,17 @@ public class GatewayConfig {
                         r -> r.path("/api/user", "/api/user/me").or()
                                 .path("/main-svc/v3/api-docs").or()
                                 .path("/api/questions").or()
-                                .path("/api/visits", "/api/visits/**").or()
                                 .path("/api/recs").or()
-                                .path("/api/places").or()
                                 .path("/api/quiz", "/api/quiz/**")
                                 .filters(applyFilter(authFilter))
                                 .uri("lb://main-svc")
                 )
                 .route(
                         "security-svc",
-                        r -> r.path("/api/auth/**", "/security-svc/v3/api-docs").or()
-                                .path("/api/password").or()
-                                .path("/api/email_code").or()
-                                .path("/api/password/recovery").or()
-                                .path("/api/email_code/verification")
+                        r -> r.path("/api/auth/**").or()
+                                .path("/security-svc/v3/api-docs").or()
+                                .path("/api/password", "/api/password/recovery").or()
+                                .path("/api/email_code", "/api/email_code/verification")
                                 .filters(applyFilter(authFilter))
                                 .uri("lb://security-svc")
                 )
@@ -50,10 +47,18 @@ public class GatewayConfig {
                                 .uri("lb://rec-svc")
                 )
                 .route(
-                        "places-ids",
+                        "places-svc-api-key",
                         r -> r.path("/api/places/ids")
                                 .filters(applyFilter(apiKeyFilter))
-                                .uri("lb://main-svc")
+                                .uri("lb://places-svc")
+                )
+                .route(
+                        "places-svc",
+                        r -> r.path( "/api/places").or()
+                                .path("/api/visits", "/api/visits/**").or()
+                                .path("/places-svc/v3/api-docs")
+                                .filters(applyFilter(authFilter))
+                                .uri("lb://places-svc")
                 )
                 .build();
     }

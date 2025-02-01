@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: place-svc-test
+
+  datasource:
+    url: "${DB_URL}"
+    username: "${DB_USER}"
+    password: "${DB_PASSWORD}"
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    baseline-on-migrate: true
+
+  jpa:
+    show-sql: false
+    database: postgresql
+    hibernate:
+      ddl-auto: create-drop
+
+testcontainers:
+  reuse:
+    enabled: true
