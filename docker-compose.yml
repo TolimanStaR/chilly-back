@@ -118,6 +118,8 @@ services:
       GATEWAY_PORT: "${GATEWAY_PORT}"
       EMAIL_USERNAME: "${EMAIL_USERNAME}"
       EMAIL_PASSWORD: "${EMAIL_PASSWORD}"
+      DEF_ADMIN_USER: "${DEF_ADMIN_USER}"
+      DEF_ADMIN_PASSWORD: "${DEF_ADMIN_PASSWORD}"
     networks:
       - chilly-net
 
