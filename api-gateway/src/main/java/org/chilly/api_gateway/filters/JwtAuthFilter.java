@@ -1,6 +1,7 @@
-package org.chilly.api_gateway.config;
+package org.chilly.api_gateway.filters;
 
 import lombok.RequiredArgsConstructor;
+import org.chilly.api_gateway.config.RouteValidator;
 import org.chilly.api_gateway.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -12,6 +13,8 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import static org.chilly.api_gateway.filters.FilterUtils.*;
 
 @RefreshScope
 @Component
@@ -46,29 +49,6 @@ public class JwtAuthFilter implements GatewayFilter {
 
         updateRequest(exchange, token);
         return chain.filter(exchange);
-    }
-
-    private boolean isMissingAuth(ServerHttpRequest request) {
-        return !request.getHeaders().containsKey("Authorization");
-    }
-
-    private Mono<Void> onError(ServerWebExchange exchange, HttpStatus status) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(status);
-        return response.setComplete();
-    }
-
-    private String getAuthToken(ServerHttpRequest request) {
-        String value;
-        try {
-            value = request.getHeaders().getOrEmpty("Authorization").get(0);
-        } catch (Exception e) {
-            return null;
-        }
-        if (!value.startsWith("Bearer ")) {
-            return null;
-        }
-        return value.substring(7);
     }
 
     private void updateRequest(ServerWebExchange exchange, String token) {
