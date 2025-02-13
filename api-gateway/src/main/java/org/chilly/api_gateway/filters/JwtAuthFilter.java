@@ -1,6 +1,7 @@
 package org.chilly.api_gateway.filters;
 
 import lombok.RequiredArgsConstructor;
+import org.chilly.api_gateway.authority.RouteAuthorityChecker;
 import org.chilly.api_gateway.config.RouteValidator;
 import org.chilly.api_gateway.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -25,6 +25,7 @@ public class JwtAuthFilter implements GatewayFilter {
     private String userIdHeader;
 
     private final RouteValidator validator;
+    private final RouteAuthorityChecker authorityChecker;
     private final JwtService jwtService;
 
     @Override
@@ -45,6 +46,10 @@ public class JwtAuthFilter implements GatewayFilter {
 
         if (jwtService.isNotValid(token)) {
             return onError(exchange, HttpStatus.FORBIDDEN);
+        }
+
+        if (!authorityChecker.checkAuthorities(token, request)) {
+            onError(exchange, HttpStatus.UNAUTHORIZED);
         }
 
         updateRequest(exchange, token);

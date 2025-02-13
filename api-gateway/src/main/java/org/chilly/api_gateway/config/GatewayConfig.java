@@ -3,7 +3,6 @@ package org.chilly.api_gateway.config;
 import lombok.RequiredArgsConstructor;
 import org.chilly.api_gateway.filters.ApiKeyFilter;
 import org.chilly.api_gateway.filters.JwtAuthFilter;
-import org.chilly.api_gateway.filters.JwtAuthorityFilterFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
@@ -20,7 +19,6 @@ public class GatewayConfig {
 
     private final JwtAuthFilter authFilter;
     private final ApiKeyFilter apiKeyFilter;
-    private final JwtAuthorityFilterFactory authorityFilterFactory;
 
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
@@ -69,9 +67,5 @@ public class GatewayConfig {
 
     private Function<GatewayFilterSpec, UriSpec> applyFilter(GatewayFilter filter) {
         return filterSpec -> filterSpec.filter(filter);
-    }
-
-    private Function<GatewayFilterSpec, UriSpec> applyFilters(GatewayFilter... filters) {
-        return filterSpec -> filterSpec.filters(filters);
     }
 }
