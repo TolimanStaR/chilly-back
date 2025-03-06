@@ -1,6 +1,8 @@
 package org.chilly.api_gateway.config;
 
 import lombok.RequiredArgsConstructor;
+import org.chilly.api_gateway.filters.ApiKeyFilter;
+import org.chilly.api_gateway.filters.JwtAuthFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;

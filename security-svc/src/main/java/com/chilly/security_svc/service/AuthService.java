@@ -1,6 +1,7 @@
 package com.chilly.security_svc.service;
 
 import com.chilly.security_svc.model.RefreshToken;
+import com.chilly.security_svc.model.Role;
 import com.chilly.security_svc.model.User;
 import com.chilly.security_svc.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
                 .build();
     }
 

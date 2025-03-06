@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,8 @@ import java.util.Map;
 @Service
 @Slf4j
 public class JwtService {
+
+    private static final String ROLES_KEY = "roles";
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -33,7 +36,11 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails, Long userId) {
         log.info("generating token with extra claim ({}, {})", userIdHeader, userId);
-        return generateToken(Map.of(userIdHeader, userId), userDetails);
+        Map<String, Object> extras = Map.ofEntries(
+                Map.entry(userIdHeader, userId),
+                Map.entry(ROLES_KEY, serializeAuthorities(userDetails))
+        );
+        return generateToken(extras, userDetails);
     }
 
     private String buildToken(Map<String, Object> extras, UserDetails userDetails, long expiration) {
@@ -51,4 +58,14 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    private String serializeAuthorities(UserDetails userDetails) {
+        return String.join(
+                ",",
+                userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList()
+        );
+    }
+
 }
