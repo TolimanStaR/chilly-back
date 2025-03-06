@@ -31,6 +31,6 @@ class PlaceController(
 
     @Operation(summary = "find all places from list of ids")
     @SecurityRequirement(name = "Api key")
-    @GetMapping("ids")
+    @PostMapping("ids")
     fun getPlacesByIds(@RequestBody ids: List<Long>) = placeService.getPlacesByIds(ids)
 }
