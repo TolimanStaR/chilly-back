@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -97,8 +98,10 @@ public class RecommendationService {
     }
 
     private List<PlaceDto> callPlacesService(List<Long> ids) {
-        return webClient.get()
+        return webClient.post()
                 .uri("http://places-svc/api/places/ids")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(ids)
                 .retrieve()
                 .bodyToMono(PLACE_DTO_LIST_TYPE_REF)
                 .block();
