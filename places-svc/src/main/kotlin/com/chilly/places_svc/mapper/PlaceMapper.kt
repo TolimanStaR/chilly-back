@@ -18,6 +18,8 @@ class PlaceMapper : DtoEntityMapper<Place, PlaceDto> {
         phone = entity.phone
         social = entity.social
         openHours = entity.openHours
+        latitude = entity.latitude
+        longitude = entity.longitude
     }
 
     override fun toEntity(dto: PlaceDto): Place = Place(
@@ -30,6 +32,8 @@ class PlaceMapper : DtoEntityMapper<Place, PlaceDto> {
         images = dto.images,
         phone = dto.phone,
         social = dto.social,
-        openHours = dto.openHours
+        openHours = dto.openHours,
+        latitude = dto.latitude,
+        longitude = dto.longitude
     )
 }

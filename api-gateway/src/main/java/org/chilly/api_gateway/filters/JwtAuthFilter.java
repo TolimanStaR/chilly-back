@@ -1,6 +1,7 @@
 package org.chilly.api_gateway.filters;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.chilly.api_gateway.authority.RouteAuthorityChecker;
 import org.chilly.api_gateway.config.RouteValidator;
 import org.chilly.api_gateway.service.JwtService;
@@ -19,6 +20,7 @@ import static org.chilly.api_gateway.filters.FilterUtils.*;
 @RefreshScope
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter implements GatewayFilter {
 
     @Value("${http.headers.user-id}")
@@ -31,11 +33,14 @@ public class JwtAuthFilter implements GatewayFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        log.info("got request to filter: path={}", request.getURI().getPath());
 
         if (validator.isOpen(request)) {
+            log.info("request is OPEN");
             return chain.filter(exchange);
         }
         if (isMissingAuth(request)) {
+            log.error("NO AUTH HEADER PROVIDED");
             return onError(exchange, HttpStatus.UNAUTHORIZED);
         }
 
@@ -45,11 +50,13 @@ public class JwtAuthFilter implements GatewayFilter {
         }
 
         if (jwtService.isNotValid(token)) {
+            log.error("TOKEN IS INVALID");
             return onError(exchange, HttpStatus.FORBIDDEN);
         }
 
-        if (!authorityChecker.checkAuthorities(token, request)) {
-            onError(exchange, HttpStatus.UNAUTHORIZED);
+        if (!authorityChecker.authoritiesMatchRequirements(token, request)) {
+            log.error("REQUEST DOES NOT SATISFY AUTHORITY REQUIREMENTS");
+            return onError(exchange, HttpStatus.UNAUTHORIZED);
         }
 
         updateRequest(exchange, token);

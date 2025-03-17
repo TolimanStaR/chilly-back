@@ -13,6 +13,7 @@ spring:
     placeholders:
       DEF_ADMIN_USER: "${DEF_ADMIN_USER}"
       DEF_ADMIN_PASSWORD: "${DEF_ADMIN_PASSWORD}"
+      DEF_ADMIN_PASSWORD_HASH: "${DEF_ADMIN_PASSWORD_HASH}"
 
   jpa:
     show-sql: false
