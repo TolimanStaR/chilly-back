@@ -4,6 +4,7 @@ import com.chilly.places_svc.mapper.PlaceMapper
 import com.chilly.places_svc.model.Place
 import com.chilly.places_svc.repository.PlaceRepository
 import org.chilly.common.dto.PlaceDto
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import kotlin.reflect.KMutableProperty
@@ -48,6 +49,10 @@ class PlaceService(
         ).any()
         return if (updated) saved else null
     }
+
+    fun findNearbyPlaces(latitude: Double, longitude: Double, page: Int, size: Int): List<PlaceDto> =
+        placeRepository.findNearByPlaces(latitude, longitude, PageRequest.of(page, size))
+            .map(placeMapper::toDto)
 
     private fun <T> checkField(dtoValue: T?, property: KMutableProperty<T>): Boolean {
         if (dtoValue == null) return false

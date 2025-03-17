@@ -42,4 +42,16 @@ class PlaceController(
     @Transactional
     @PutMapping
     fun editPlacesInfo(@RequestBody placeDtoList: List<PlaceDto>): Int = placeService.editPlaceInfo(placeDtoList)
+
+    @Operation(summary = "get paginated places sorted by distance from provided point")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("nearby")
+    fun getNearbyPlaces(
+        @RequestParam latitude: Double,
+        @RequestParam longitude: Double,
+        @RequestParam(required = false, defaultValue = "0") page: Int,
+        @RequestParam(required = false, defaultValue = "10") size: Int
+    ): List<PlaceDto> = placeService.findNearbyPlaces(latitude, longitude, page, size)
+
+
 }
