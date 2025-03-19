@@ -2,6 +2,7 @@ package com.chilly.security_svc.controller;
 
 import com.chilly.security_svc.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.chilly.common.dto.*;
@@ -43,6 +44,7 @@ public class AuthController {
 
     @Operation(summary = "change either email or phone number of logged-in user")
     @PutMapping("username")
+    @SecurityRequirement(name = "Bearer Authentication")
     @Transactional
     public void changeLogin(@RequestHeader("UserId") Long userId, @RequestBody LoginInfoChangeRequest request) {
         authService.changeUsername(userId, request);

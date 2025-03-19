@@ -30,7 +30,8 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/recs", GET),
                     new AllowedEndpoint("api/visits", GET, POST, DELETE),
                     new AllowedEndpoint("api/password", PUT),
-                    new AllowedEndpoint("api/places/nearby", GET)
+                    new AllowedEndpoint("api/places/nearby", GET),
+                    new AllowedEndpoint("api/auth/username", PUT)
             )),
             Map.entry(Role.ADMIN, List.of(
                     new AllowedEndpoint("api/questions", POST, PUT, GET),
