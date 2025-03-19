@@ -1,6 +1,7 @@
 package com.chilly.places_svc.controller
 
 import com.chilly.places_svc.service.PlaceService
+import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -15,13 +16,13 @@ import org.springframework.web.bind.annotation.*
 class PlaceController(
     private val placeService: PlaceService,
 ) {
-    @Operation(summary = "save all listed places")
+    @Operation(summary = "clear all places and then save all listed places")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @SecurityRequirement(name = "Bearer Authentication")
     @Transactional
-    fun savePlaces(@RequestBody placeDtoList: List<PlaceDto>) {
-        placeService.savePlaces(placeDtoList)
+    fun replacePlaces(@RequestBody placeDtoList: List<PlaceDto>) {
+        placeService.replacePlaces(placeDtoList)
     }
 
     @GetMapping
@@ -29,8 +30,28 @@ class PlaceController(
     @Operation(summary = "lists all known places")
     fun allPlaces() = placeService.getAllPlaces()
 
+    // TODO: Use query parameter for ids use method for both users and admins
     @Operation(summary = "find all places from list of ids")
     @SecurityRequirement(name = "Api key")
     @PostMapping("ids")
+    @Hidden
     fun getPlacesByIds(@RequestBody ids: List<Long>) = placeService.getPlacesByIds(ids)
+
+    @Operation(summary = "replaces info for provided places")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Transactional
+    @PutMapping
+    fun editPlacesInfo(@RequestBody placeDtoList: List<PlaceDto>): Int = placeService.editPlaceInfo(placeDtoList)
+
+    @Operation(summary = "get paginated places sorted by distance from provided point")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("nearby")
+    fun getNearbyPlaces(
+        @RequestParam latitude: Double,
+        @RequestParam longitude: Double,
+        @RequestParam(required = false, defaultValue = "0") page: Int,
+        @RequestParam(required = false, defaultValue = "10") size: Int
+    ): List<PlaceDto> = placeService.findNearbyPlaces(latitude, longitude, page, size)
+
+
 }

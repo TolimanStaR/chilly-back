@@ -24,4 +24,6 @@ public class PlaceDto implements Serializable {
     String phone;
     List<String> social;
     List<String> openHours;
+    Double latitude;
+    Double longitude;
 }

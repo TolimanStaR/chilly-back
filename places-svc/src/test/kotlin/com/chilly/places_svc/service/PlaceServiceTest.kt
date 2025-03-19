@@ -27,7 +27,7 @@ class PlaceServiceTest {
         every { repoMock.saveAll<Place>(any()) } returns emptyList()
         every { repoMock.deleteAll() } just Runs
 
-        underTest.savePlaces(listOf(Dto))
+        underTest.replacePlaces(listOf(Dto))
 
         verify { repoMock.deleteAll() }
         verify { repoMock.saveAll<Place>(any()) }

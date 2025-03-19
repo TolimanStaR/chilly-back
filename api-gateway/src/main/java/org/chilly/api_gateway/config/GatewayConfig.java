@@ -56,7 +56,7 @@ public class GatewayConfig {
                 )
                 .route(
                         "places-svc",
-                        r -> r.path( "/api/places").or()
+                        r -> r.path( "/api/places", "/api/places/**").or()
                                 .path("/api/visits", "/api/visits/**").or()
                                 .path("/places-svc/v3/api-docs")
                                 .filters(applyFilter(authFilter))

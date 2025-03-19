@@ -40,7 +40,7 @@ class PlaceControllerTest(
 
     @Test
     fun `save places returns status created`() {
-        every { placeServiceMock.savePlaces(any()) } just Runs
+        every { placeServiceMock.replacePlaces(any()) } just Runs
 
         mockMvc.post("/api/places") {
             contentType = MediaType.APPLICATION_JSON
@@ -49,7 +49,7 @@ class PlaceControllerTest(
             status { isCreated() }
         }
 
-        verify { placeServiceMock.savePlaces(eq(listOf(placeDto))) }
+        verify { placeServiceMock.replacePlaces(eq(listOf(placeDto))) }
     }
 
 

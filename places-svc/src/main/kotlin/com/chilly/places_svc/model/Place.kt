@@ -19,6 +19,12 @@ class Place(
     @Column(name = "website", nullable = true)
     var website: String? = null,
 
+    @Column(name = "latitude", nullable = false)
+    var latitude: Double = 0.0,
+
+    @Column(name = "longitude", nullable = false)
+    var longitude: Double = 0.0,
+
     @Column(name = "y_page", nullable = true)
     var yPage: String? = null,
 

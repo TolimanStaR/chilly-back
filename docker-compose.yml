@@ -33,6 +33,8 @@ services:
       - "-p ${SEC_DB_PORT}"
     networks:
       - chilly-net
+    ports:
+      - "${SEC_DB_PORT}:${SEC_DB_PORT}"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${SEC_USER} -d ${SEC_DB} -p ${SEC_DB_PORT}"]
       interval: 10s
@@ -41,7 +43,7 @@ services:
       start_period: 7s
 
   places_db:
-    image: postgres:alpine
+    image: postgis/postgis:17-3.5-alpine
     volumes:
       - places_pg_volume:/var/lib/postgresql/data
     environment:
@@ -53,6 +55,8 @@ services:
       - "-p ${PLACE_DB_PORT}"
     networks:
       - chilly-net
+    ports:
+      - "${PLACE_DB_PORT}:${PLACE_DB_PORT}"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${PLACE_USER} -d ${PLACE_DB} -p ${PLACE_DB_PORT}" ]
       interval: 10s
@@ -120,6 +124,7 @@ services:
       EMAIL_PASSWORD: "${EMAIL_PASSWORD}"
       DEF_ADMIN_USER: "${DEF_ADMIN_USER}"
       DEF_ADMIN_PASSWORD: "${DEF_ADMIN_PASSWORD}"
+      DEF_ADMIN_PASSWORD_HASH: "${DEF_ADMIN_PASSWORD_HASH}"
     networks:
       - chilly-net
 
