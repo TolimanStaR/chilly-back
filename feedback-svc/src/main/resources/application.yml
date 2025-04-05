@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: feedback-svc
+
+  datasource:
+    url: "jdbc:postgresql://${FEEDBACK_HOST}:${FEEDBACK_DB_PORT}/${FEEDBACK_DB}" # host = localhost, db = feedback
+    username: "${FEEDBACK_USER}" # user = feedback_user
+    password: "${FEEDBACK_PASSWORD}" # password = feedback_password
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    baseline-on-migrate: true
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: 0
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+springdoc:
+  swagger-ui:
+    try-it-out-enabled: true
+    operations-sorter: method
+    path: /feedback-svc/swagger-ui.html
+    url: http://localhost:${GATEWAY_PORT}
+  api-docs:
+    path: /feedback-svc/v3/api-docs
