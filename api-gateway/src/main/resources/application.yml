@@ -31,5 +31,7 @@ springdoc:
         name: Security Service
       - url: /places-svc/v3/api-docs
         name: Places Service
+      - url: /feedback-svc/v3/api-docs
+        name: Feedback Service
   api-docs:
     enabled: true

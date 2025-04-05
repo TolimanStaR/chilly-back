@@ -63,6 +63,28 @@ services:
       timeout: 5s
       retries: 5
       start_period: 7s
+      
+  feedback_db:
+    image: postgres:alpine
+    volumes:
+      - feedback_pg_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "${FEEDBACK_DB}"
+      POSTGRES_USER: "${FEEDBACK_USER}"
+      POSTGRES_PASSWORD: "${FEEDBACK_PASSWORD}"
+    restart: unless-stopped
+    command:
+      - "-p ${FEEDBACK_DB_PORT}"
+    networks:
+      - chilly-net
+    ports:
+      - "${FEEDBACK_DB_PORT}:${FEEDBACK_DB_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${FEEDBACK_USER} -d ${FEEDBACK_DB} -p ${FEEDBACK_DB_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 7s
 
   eureka:
     image: "tolimanstar/chilly_discovery_server:latest"
@@ -149,6 +171,27 @@ services:
     networks:
       - chilly-net
 
+  feedback:
+    depends_on:
+      feedback_db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    image: "tolimanstar/chilly_feedback:latest"
+    build:
+      context: ./
+      dockerfile: ./feedback-svc/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      FEEDBACK_DB: "${FEEDBACK_DB}"
+      FEEDBACK_HOST: feedback_db
+      FEEDBACK_USER: "${FEEDBACK_USER}"
+      FEEDBACK_PASSWORD: "${FEEDBACK_PASSWORD}"
+      FEEDBACK_DB_PORT: "${FEEDBACK_DB_PORT}"
+      GATEWAY_PORT: "${GATEWAY_PORT}"
+    networks:
+      - chilly-net
+  
   gateway:
     depends_on:
       eureka:
@@ -188,6 +231,7 @@ volumes:
   main_pg_volume:
   security_pg_volume:
   places_pg_volume:
+  feedback_pg_volume:
 
 networks:
   chilly-net: {}
