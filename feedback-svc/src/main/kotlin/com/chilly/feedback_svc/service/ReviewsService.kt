@@ -11,13 +11,26 @@ class ReviewsService(
     private val reviewRepository: ReviewRepository,
     private val reviewMapper: ReviewMapper
 ) {
-    fun createReview(reviewDto: ReviewDto, userId: Long) {
-        reviewMapper.toEntity(reviewDto)
-            .apply { this.userId = userId }
-            .let(reviewRepository::save)
+    fun updateOrCreateReview(reviewDto: ReviewDto, userId: Long): Boolean {
+        val existingReview = reviewRepository.findByPlaceIdAndUserId(reviewDto.placeId, userId)
+            ?: return createNewReview(reviewDto, userId)
+
+        existingReview.apply {
+            rating = reviewDto.rating
+            commentText = reviewDto.commentText
+            timestamp = reviewMapper.toEntity(reviewDto).timestamp
+        }
+        reviewRepository.save(existingReview)
+        return false
     }
 
     fun getReviewsForPlace(placeId: Long, page: Int, size: Int): List<ReviewDto> =
         reviewRepository.findByPlaceIdOrderByTimestampDesc(placeId, PageRequest.of(page, size))
             .map(reviewMapper::toDto)
+
+    private fun createNewReview(dto: ReviewDto, userId: Long): Boolean =
+        reviewMapper.toEntity(dto)
+            .apply { this.userId = userId }
+            .let(reviewRepository::save)
+            .let { true }
 }
