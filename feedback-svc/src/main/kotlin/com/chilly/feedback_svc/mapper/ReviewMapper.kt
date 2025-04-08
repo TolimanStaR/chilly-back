@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class ReviewMapper(
-    private val dateTimeToLongConverter: LocalDateTimeToLongConverter
+    private val timeConverter: InstantToLongConverter
 ) : DtoEntityMapper<Review, ReviewDto> {
 
     override fun toDto(entity: Review): ReviewDto = ReviewDto().apply {
@@ -15,7 +15,7 @@ class ReviewMapper(
         userId = entity.userId
         commentText = entity.commentText
         rating = entity.rating
-        timestamp = dateTimeToLongConverter.convertToDatabaseColumn(entity.timestamp)
+        timestamp = timeConverter.convertToDatabaseColumn(entity.timestamp)
     }
 
     override fun toEntity(dto: ReviewDto): Review = Review(
@@ -23,7 +23,7 @@ class ReviewMapper(
         userId = dto.userId,
         commentText = dto.commentText,
         rating = dto.rating,
-        timestamp = dateTimeToLongConverter.convertToEntityAttribute(dto.timestamp)
+        timestamp = timeConverter.convertToEntityAttribute(dto.timestamp)
     ).apply {
         id = dto.id
     }

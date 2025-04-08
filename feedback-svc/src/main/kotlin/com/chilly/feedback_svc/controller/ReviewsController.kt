@@ -4,6 +4,7 @@ import com.chilly.feedback_svc.service.ReviewsService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.chilly.common.dto.AddReviewRequest
 import org.chilly.common.dto.ReviewDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,10 +23,10 @@ class ReviewsController(
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "save review for a given place from a given user")
     fun createReview(
-        @RequestBody reviewDto: ReviewDto,
+        @RequestBody request: AddReviewRequest,
         @RequestHeader("UserId") userId: Long
     ): ResponseEntity<Unit> {
-        return reviewsService.updateOrCreateReview(reviewDto, userId)
+        return reviewsService.updateOrCreateReview(request, userId)
             .let { created ->
                 val status = if (created) HttpStatus.CREATED else HttpStatus.OK
                 ResponseEntity.status(status).build()

@@ -1,8 +1,8 @@
 package com.chilly.feedback_svc.model
 
-import com.chilly.feedback_svc.mapper.LocalDateTimeToLongConverter
+import com.chilly.feedback_svc.mapper.InstantToLongConverter
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity(name = "review")
 @Table(name = "reviews")
@@ -21,8 +21,8 @@ class Review(
     var commentText: String? = null,
 
     @Column(name = "timestamp", nullable = false)
-    @Convert(converter = LocalDateTimeToLongConverter::class)
-    var timestamp: LocalDateTime
+    @Convert(converter = InstantToLongConverter::class)
+    var timestamp: Instant
 ) {
 
     @Id
