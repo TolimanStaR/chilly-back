@@ -25,6 +25,12 @@ public class AuthController {
         authService.registerUser(request);
     }
 
+    @Operation(summary = "register new user internal, returns id of registered user", hidden = true)
+    @PostMapping("register/internal")
+    public Long registerInternal(@RequestBody RegisterInternalRequest request) {
+        return authService.registerUser(request);
+    }
+
     @Operation(
             summary = "log in existing user",
             description = "generates token pair for user by username that can be either phone or email and password"

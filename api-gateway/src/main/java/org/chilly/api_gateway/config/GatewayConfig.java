@@ -69,6 +69,13 @@ public class GatewayConfig {
                                 .filters(applyFilter(authFilter))
                                 .uri("lb://feedback-svc")
                 )
+                .route(
+                        "business-users-svc",
+                        r -> r.path("/api/business_users", "/api/business_users/**").or()
+                                .path("/business-users-svc/v3/api-docs")
+                                .filters(applyFilter(authFilter))
+                                .uri("lb://business-users-svc")
+                )
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package com.chilly.feedback_svc.containers
+package org.chilly.business.users.containers
 
 import org.testcontainers.containers.PostgreSQLContainer
 
@@ -16,7 +16,7 @@ class PostgresTestContainer private constructor() : PostgreSQLContainer<Postgres
     override fun stop() = Unit
 
     companion object {
-        private val IMAGE_VERSION = "postgres:alpine"
+        private const val IMAGE_VERSION = "postgres:alpine"
         private const val DATABASE_NAME = "test"
 
         private var container: PostgresTestContainer? = null

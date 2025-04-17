@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 @Service
@@ -31,19 +32,9 @@ public class AuthService {
     private final WebClient webClient;
 
     public void registerUser(RegisterRequest request) {
-        if (request.getPhoneNumber() == null || request.getEmail() == null) {
-            throw new EmptyDataException("to be registered user should have phone and email");
-        }
+        checkEmailAndPhone(request.getEmail(), request.getPhoneNumber());
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new EntityExistsException("email already in use");
-        }
-
-        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
-            throw new EntityExistsException("phone number already in use");
-        }
-
-        User user = userRepository.save(buildUserFromRequest(request));
+        User user = userRepository.save(buildUserFromRequest(mapToInternal(request)));
         UserDto dto = convertToUserDto(user, request);
 
         try {
@@ -53,6 +44,13 @@ public class AuthService {
             userRepository.deleteById(user.getId());
             throw new CallFailedException("request to main service failed");
         }
+    }
+
+    public Long registerUser(RegisterInternalRequest request) {
+        log.info("calling register user internally");
+        checkEmailAndPhone(request.getEmail(), request.getPhoneNumber());
+        return userRepository.save(buildUserFromRequest(request))
+                .getId();
     }
 
     public TokenResponse loginUser(LoginRequest request) {
@@ -72,12 +70,39 @@ public class AuthService {
         return generateTokensForUser(user);
     }
 
-    private User buildUserFromRequest(RegisterRequest request) {
+    private void checkEmailAndPhone(String email, String phone) {
+        if (phone == null || email == null) {
+            throw new EmptyDataException("to be registered user should have phone and email");
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EntityExistsException("email already in use");
+        }
+
+        if (userRepository.findByPhoneNumber(phone).isPresent()) {
+            throw new EntityExistsException("phone number already in use");
+        }
+    }
+
+    private RegisterInternalRequest mapToInternal(RegisterRequest request) {
+        return RegisterInternalRequest.builder()
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .password(request.getPassword())
+                .roles(List.of(Role.USER.name()))
+                .build();
+    }
+
+    private User buildUserFromRequest(RegisterInternalRequest request) {
+        List<String> roles = request.getRoles();
+        if (roles == null) {
+            roles = List.of();
+        }
         return User.builder()
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .role(roles.stream().map(Role::valueOf).toList())
                 .build();
     }
 
