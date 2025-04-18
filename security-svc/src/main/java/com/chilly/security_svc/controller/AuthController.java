@@ -31,6 +31,12 @@ public class AuthController {
         return authService.registerUser(request);
     }
 
+    @Operation(summary = "get username data by user id", hidden = true)
+    @GetMapping("me/{userId}/internal")
+    public UsernameData getUsernameData(@PathVariable("userId") Long userId) {
+        return authService.getUsernameData(userId);
+    }
+
     @Operation(
             summary = "log in existing user",
             description = "generates token pair for user by username that can be either phone or email and password"

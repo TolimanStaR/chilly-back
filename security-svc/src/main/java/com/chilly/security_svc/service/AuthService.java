@@ -53,6 +53,15 @@ public class AuthService {
                 .getId();
     }
 
+    public UsernameData getUsernameData(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchEntityException("User not found by id"));
+        return UsernameData.builder()
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .build();
+    }
+
     public TokenResponse loginUser(LoginRequest request) {
         // TODO check if user exists
         User authenticatedUser = authenticateUser(request);
