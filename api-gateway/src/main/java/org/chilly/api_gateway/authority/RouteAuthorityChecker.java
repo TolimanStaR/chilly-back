@@ -42,7 +42,8 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/places/nearby", GET)
             )),
             Map.entry(Role.BUSINESS, List.of(
-                    new AllowedEndpoint("api/business_users/me", GET)
+                    new AllowedEndpoint("api/business_users/me", GET),
+                    new AllowedEndpoint("api/business/place_requests", GET, PUT, DELETE)
             ))
     );
 

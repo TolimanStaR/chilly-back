@@ -72,6 +72,7 @@ public class GatewayConfig {
                 .route(
                         "business-users-svc",
                         r -> r.path("/api/business_users", "/api/business_users/**").or()
+                                .path("/api/business/place_requests", "/api/business/place_requests/**").or()
                                 .path("/business-users-svc/v3/api-docs")
                                 .filters(applyFilter(authFilter))
                                 .uri("lb://business-users-svc")
