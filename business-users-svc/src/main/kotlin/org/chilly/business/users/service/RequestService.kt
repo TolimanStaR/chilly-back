@@ -48,6 +48,7 @@ class RequestService(
             openHours = request.openHours
         ).apply {
             owner = user
+            user.requests.add(this)
         }
         repository.save(entity)
     }
@@ -60,6 +61,7 @@ class RequestService(
     }
 
     private fun PlaceAddRequest.toDto() = PlaceRequestDto(
+        /* id = */ id,
         /* ownerId = */ owner.id,
         /* timestamp = */ timestamp.toEpochMilli(),
         /* status = */ status.name,

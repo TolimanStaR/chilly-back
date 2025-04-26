@@ -29,6 +29,7 @@ class PlaceRequestController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     @Operation(summary = "Create a request to Add place to the system")
     fun createRequest(
         @RequestHeader("UserId") userId: Long,
@@ -60,6 +61,7 @@ class PlaceRequestController(
     }
 
     @DeleteMapping("{id}")
+    @Transactional
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "delete the request specified by id")
     fun deleteRequest(

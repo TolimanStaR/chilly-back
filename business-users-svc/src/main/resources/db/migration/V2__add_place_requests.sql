@@ -25,4 +25,4 @@ CREATE TABLE place_requests
 );
 
 ALTER TABLE place_requests
-    ADD CONSTRAINT FK_REQUESTS_ON_USERS FOREIGN KEY (owner_id) REFERENCES place_requests (id);
+    ADD CONSTRAINT FK_REQUESTS_ON_USERS FOREIGN KEY (owner_id) REFERENCES business_users (id);

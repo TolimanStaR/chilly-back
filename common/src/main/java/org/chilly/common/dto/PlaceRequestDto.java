@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PlaceRequestDto {
+    Long id;
     Long ownerId;
     Long timestamp; /* UTC milliseconds */
     String status;
