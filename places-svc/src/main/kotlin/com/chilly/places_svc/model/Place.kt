@@ -6,6 +6,7 @@ import jakarta.persistence.*
 @Entity(name = "place")
 @Table(name = "places")
 class Place(
+    // todo add sequence generator starting from 1000
     @Id
     @Column(name = "id", nullable = false)
     val id: Long,

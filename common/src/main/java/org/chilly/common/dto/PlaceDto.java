@@ -17,13 +17,13 @@ public class PlaceDto implements Serializable {
     Long id;
     String name;
     String address;
-    String website;
-    String yPage;
-    Double rating;
+    String website; /*nullable*/
+    String yPage; /*nullable*/
+    Double rating; /*nullable*/
     List<String> images;
-    String phone;
-    List<String> social;
-    List<String> openHours;
+    String phone; /*nullable*/
+    List<String> social; /*nullable*/
+    List<String> openHours; /*nullable*/
     Double latitude;
     Double longitude;
 }

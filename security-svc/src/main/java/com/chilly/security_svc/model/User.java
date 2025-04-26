@@ -42,13 +42,15 @@ public class User implements UserDetails {
     @Column(name = "recovery_code")
     private String recoveryCode;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = RoleListToStringConverter.class)
     @Column(name = "role")
-    private Role role;
+    private List<Role> role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return role.stream()
+                .map(item -> new SimpleGrantedAuthority(item.name()))
+                .toList();
     }
 
     @Override

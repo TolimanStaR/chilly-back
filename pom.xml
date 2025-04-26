@@ -24,6 +24,7 @@
         <module>places-svc</module>
         <module>common</module>
         <module>feedback-svc</module>
+        <module>business-users-svc</module>
     </modules>
 
     <properties>
