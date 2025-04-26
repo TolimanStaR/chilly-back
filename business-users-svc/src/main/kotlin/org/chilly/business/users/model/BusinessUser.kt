@@ -1,10 +1,6 @@
 package org.chilly.business.users.model
 
-import jakarta.persistence.Column
-import jakarta.persistence.Convert
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.chilly.business.users.mapper.BusinessCategoryToStringConverter
 
 @Entity(name = "business_user")
@@ -29,4 +25,8 @@ class BusinessUser (
 
     @Column(name = "kpp", nullable = true)
     var kpp: String? = null
-)
+) {
+
+    @OneToMany(mappedBy = "owner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var requests: MutableSet<PlaceAddRequest> = mutableSetOf()
+}

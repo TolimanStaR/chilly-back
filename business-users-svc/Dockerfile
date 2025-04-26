@@ -9,7 +9,7 @@ COPY business-users-svc/pom.xml /app/module/pom.xml
 RUN mvn -f /app/module/pom.xml verify --fail-never
 
 COPY business-users-svc/src /app/module/src
-RUN mvn -f /app/module/pom.xml clean package -DskipTests
+RUN mvn -f /app/module/pom.xml clean package -DskipTests -e -X
 
 FROM openjdk:17.0.1
 LABEL authors="musht"
