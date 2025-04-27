@@ -78,7 +78,8 @@ class RequestService(
             /* social = */ social,
             /* openHours = */ openHours,
             /* latitude = */ latitude,
-            /* longitude = */ longitude
+            /* longitude = */ longitude,
+            /* ownerId = */ null
         )
     )
 

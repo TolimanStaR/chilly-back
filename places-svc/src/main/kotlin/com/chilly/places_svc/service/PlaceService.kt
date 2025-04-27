@@ -32,6 +32,20 @@ class PlaceService(
             .let(placeRepository::saveAll)
             .size
 
+    fun findNearbyPlaces(latitude: Double, longitude: Double, page: Int, size: Int): List<PlaceDto> =
+        placeRepository.findNearByPlaces(latitude, longitude, PageRequest.of(page, size))
+            .map(placeMapper::toDto)
+
+    fun addPlaceInternal(data: PlaceDto) {
+        placeMapper.toEntity(data)
+            .let(placeRepository::save)
+    }
+
+    fun getOwnedPlaces(ownerId: Long): List<PlaceDto> =
+        placeRepository.findAllByOwnerId(ownerId)
+            .map(placeMapper::toDto)
+
+
     private fun changePlaceUsingDto(dto: PlaceDto): Place? {
         val saved = dto.id?.let(placeRepository::findByIdOrNull) ?: return null
         val updated = listOf(
@@ -46,13 +60,9 @@ class PlaceService(
             checkField(dto.openHours, saved::openHours),
             checkField(dto.latitude, saved::latitude),
             checkField(dto.longitude, saved::longitude)
-        ).any()
+        ).any { it }
         return if (updated) saved else null
     }
-
-    fun findNearbyPlaces(latitude: Double, longitude: Double, page: Int, size: Int): List<PlaceDto> =
-        placeRepository.findNearByPlaces(latitude, longitude, PageRequest.of(page, size))
-            .map(placeMapper::toDto)
 
     private fun <T> checkField(dtoValue: T?, property: KMutableProperty<T>): Boolean {
         if (dtoValue == null) return false

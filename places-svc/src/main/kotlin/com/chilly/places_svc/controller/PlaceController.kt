@@ -1,3 +1,4 @@
+@file:Suppress("UNUSED")
 package com.chilly.places_svc.controller
 
 import com.chilly.places_svc.service.PlaceService
@@ -30,13 +31,6 @@ class PlaceController(
     @Operation(summary = "lists all known places")
     fun allPlaces() = placeService.getAllPlaces()
 
-    // TODO: Use query parameter for ids use method for both users and admins
-    @Operation(summary = "find all places from list of ids")
-    @SecurityRequirement(name = "Api key")
-    @PostMapping("ids")
-    @Hidden
-    fun getPlacesByIds(@RequestBody ids: List<Long>) = placeService.getPlacesByIds(ids)
-
     @Operation(summary = "replaces info for provided places")
     @SecurityRequirement(name = "Bearer Authentication")
     @Transactional
@@ -53,5 +47,28 @@ class PlaceController(
         @RequestParam(required = false, defaultValue = "10") size: Int
     ): List<PlaceDto> = placeService.findNearbyPlaces(latitude, longitude, page, size)
 
+    /* Internal Requests */
 
+    @PostMapping("new/internal")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Hidden
+    @Operation(summary = "add one place with owner assigned")
+    fun addPlaceInternal(
+        @RequestBody data: PlaceDto
+    ) {
+        placeService.addPlaceInternal(data)
+    }
+
+    @GetMapping("owned_by/{id}/internal")
+    fun getPlacesByOwnerId(
+        @PathVariable("id") ownerId: Long
+    ): List<PlaceDto> {
+        return placeService.getOwnedPlaces(ownerId)
+    }
+
+    @Operation(summary = "find all places from list of ids")
+    @SecurityRequirement(name = "Api key")
+    @PostMapping("ids")
+    @Hidden
+    fun getPlacesByIdsInternal(@RequestBody ids: List<Long>) = placeService.getPlacesByIds(ids)
 }

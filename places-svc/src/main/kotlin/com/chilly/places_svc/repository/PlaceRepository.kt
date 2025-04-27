@@ -17,4 +17,6 @@ interface PlaceRepository : JpaRepository<Place, Long> {
         nativeQuery = true
     )
     fun findNearByPlaces(@Param("lat") latitude: Double, @Param("lon") longitude: Double, pageable: Pageable): List<Place>
+
+    fun findAllByOwnerId(ownerId: Long): List<Place>
 }

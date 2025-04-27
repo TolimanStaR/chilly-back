@@ -6,8 +6,9 @@ import jakarta.persistence.*
 @Entity(name = "place")
 @Table(name = "places")
 class Place(
-    // todo add sequence generator starting from 1000
     @Id
+    @SequenceGenerator(name = "place_sequence", allocationSize = 1, initialValue = 1000)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "place_sequence")
     @Column(name = "id", nullable = false)
     val id: Long,
 
@@ -46,6 +47,9 @@ class Place(
     @Column(name = "open_hours", nullable = true)
     @Convert(converter = ListToStringConverter::class)
     var openHours: List<String>? = null,
+
+    @Column(name = "owner_id", nullable = true)
+    var ownerId: Long? = null
 ) {
 
     @OneToMany(mappedBy = "place", orphanRemoval = true)
