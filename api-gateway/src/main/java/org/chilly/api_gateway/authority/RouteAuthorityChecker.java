@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.springframework.http.HttpMethod.*;
 
@@ -39,11 +41,14 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/questions", POST, PUT, GET),
                     new AllowedEndpoint("api/places", POST, PUT, GET),
                     new AllowedEndpoint("api/visits", GET),
-                    new AllowedEndpoint("api/places/nearby", GET)
+                    new AllowedEndpoint("api/places/nearby", GET),
+                    new AllowedEndpoint("api/business/place_requests/[^/]+/approve", POST),
+                    new AllowedEndpoint("api/business/place_requests/[^/]+/decline", POST)
             )),
             Map.entry(Role.BUSINESS, List.of(
                     new AllowedEndpoint("api/business_users/me", GET),
-                    new AllowedEndpoint("api/business/place_requests", POST, GET, PUT, DELETE)
+                    new AllowedEndpoint("api/business/place_requests", POST, GET, PUT, DELETE),
+                    new AllowedEndpoint("/api/business/places", GET)
             ))
     );
 
@@ -74,7 +79,12 @@ public class RouteAuthorityChecker {
      */
     private boolean requestAllowedByAuthority(String path, HttpMethod method, Role role) {
         return allowedByRole.get(role).stream()
-                .anyMatch(endpoint -> endpoint.methods().contains(method) && path.contains(endpoint.pathPiece()));
+                .anyMatch(endpoint -> endpoint.methods().contains(method) && checkPathByPattern(path, endpoint.pattern()));
+    }
+
+    private boolean checkPathByPattern(String path, Pattern pattern) {
+        Matcher matcher = pattern.matcher(path);
+        return matcher.find();
     }
 
     private List<Role> parseJwtAuthorities(String token) {

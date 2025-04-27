@@ -5,12 +5,11 @@ import jakarta.persistence.*
 
 @Entity(name = "place")
 @Table(name = "places")
+@SequenceGenerator(name = "place_sequence", allocationSize = 1, initialValue = 1000)
 class Place(
     @Id
-    @SequenceGenerator(name = "place_sequence", allocationSize = 1, initialValue = 1000)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "place_sequence")
     @Column(name = "id", nullable = false)
-    val id: Long,
+    var id: Long? = null,
 
     @Column(name = "name", nullable = false)
     var name: String,

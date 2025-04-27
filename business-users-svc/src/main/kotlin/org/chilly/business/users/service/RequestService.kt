@@ -7,17 +7,21 @@ import org.chilly.business.users.repository.UserRepository
 import org.chilly.common.dto.PlaceDto
 import org.chilly.common.dto.PlaceRequestDto
 import org.chilly.common.exception.AccessDeniedException
+import org.chilly.common.exception.CallFailedException
 import org.chilly.common.exception.NoSuchEntityException
 import org.chilly.common.exception.WrongDataException
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.Instant
 import kotlin.reflect.KMutableProperty
 
 @Service
 class RequestService(
     private val userRepository: UserRepository,
-    private val repository: PlaceRequestRepository
+    private val repository: PlaceRequestRepository,
+    private val webClient: WebClient,
 ) {
 
     fun createRequest(userId: Long, request: PlaceDto) {
@@ -60,6 +64,50 @@ class RequestService(
             .map { it.toDto() }
     }
 
+    fun changeRequest(userId: Long, requestId: Long, data: PlaceDto) {
+        val request = checkExistingRequest(userId, requestId)
+        request::name.checkAndSet(data.name)
+        request::address.checkAndSet(data.address)
+        request::website.checkAndSet(data.website)
+        request::yPage.checkAndSet(data.yPage)
+        request::phone.checkAndSet(data.phone)
+        request::images.checkAndSet(data.images, ::discardListUpdateCheck)
+        request::openHours.checkAndSet(data.openHours, ::discardListUpdateCheck)
+        request::social.checkAndSet(data.social, ::discardListUpdateCheck)
+        request::latitude.checkAndSet(data.latitude)
+        request::longitude.checkAndSet(data.longitude)
+
+        repository.save(request)
+    }
+
+    fun approveRequest(requestId: Long) {
+        val request = repository.findByIdOrNull(requestId)
+            ?: throw NoSuchEntityException("cannot find request with id=$requestId")
+        checkRequestStatus(request)
+
+        request.status = RequestStatus.APPROVED
+        val savedId = callAddPlaceInternal(request.toDto().placeInfo)
+            .getOrElse {
+                throw CallFailedException("cannot save approved place in the places service, request failed")
+            }
+        println("saved places with id = $savedId")
+    }
+
+    fun declineRequest(requestId: Long, reason: String) {
+        val request = repository.findByIdOrNull(requestId)
+            ?: throw NoSuchEntityException("cannot find request with id=$requestId")
+        checkRequestStatus(request)
+
+        request.status = RequestStatus.DECLINED
+        request.reason = reason
+    }
+
+    private fun checkRequestStatus(request: PlaceAddRequest) {
+        if (request.status != RequestStatus.CREATED) {
+            throw AccessDeniedException("request has been already approved or declined")
+        }
+    }
+
     private fun PlaceAddRequest.toDto() = PlaceRequestDto(
         /* id = */ id,
         /* ownerId = */ owner.id,
@@ -79,7 +127,7 @@ class RequestService(
             /* openHours = */ openHours,
             /* latitude = */ latitude,
             /* longitude = */ longitude,
-            /* ownerId = */ null
+            /* ownerId = */ owner.id
         )
     )
 
@@ -87,33 +135,24 @@ class RequestService(
         userRepository.findByIdOrNull(id)
             ?: throw NoSuchEntityException("user with id=$id not found")
 
-    fun changeRequest(userId: Long, requestId: Long, data: PlaceDto) {
-        val request = checkExistingRequest(userId, requestId)
-        request::name.checkAndSet(data.name)
-        request::address.checkAndSet(data.address)
-        request::website.checkAndSet(data.website)
-        request::yPage.checkAndSet(data.yPage)
-        request::phone.checkAndSet(data.phone)
-        request::images.checkAndSet(data.images, ::checkLists)
-        request::openHours.checkAndSet(data.openHours, ::checkLists)
-        request::social.checkAndSet(data.social, ::checkLists)
-        request::latitude.checkAndSet(data.latitude)
-        request::longitude.checkAndSet(data.longitude)
+    private fun callAddPlaceInternal(place: PlaceDto): Result<Long> =
+        webClient.post()
+            .uri("http://places-svc/api/places/new/internal")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(place)
+            .awaitResult()
 
-        repository.save(request)
-    }
-
-    private fun checkLists(old: List<String>?, new: List<String>?): Boolean {
-        if (old == new) return false
-        return new?.all { it.isNotBlank() } ?: false
+    private fun discardListUpdateCheck(old: List<String>?, new: List<String>?): Boolean {
+        if (old == new) return true
+        return new?.any { it.isBlank() } ?: true
     }
 
     private inline fun <T> KMutableProperty<T>.checkAndSet(
         newValue: T?,
-        check: (T, T) -> Boolean = { a, b -> a == b }
+        guardCond: (T, T) -> Boolean = { a, b -> a == b }
     ) {
         val oldValue = getter.call()
-        if (newValue == null || check(oldValue, newValue)) {
+        if (newValue == null || guardCond(oldValue, newValue)) {
             return
         }
         setter.call(newValue)

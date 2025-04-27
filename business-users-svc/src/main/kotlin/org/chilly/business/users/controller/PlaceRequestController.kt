@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -69,5 +70,26 @@ class PlaceRequestController(
         @PathVariable("id") requestId: Long,
     ) {
         return service.deleteRequest(userId, requestId)
+    }
+
+    @PostMapping("{id}/approve")
+    @Transactional
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "approve request specified by id")
+    fun approveRequest(
+        @PathVariable("id") requestId: Long,
+    ) {
+        service.approveRequest(requestId)
+    }
+
+    @PostMapping("{id}/decline")
+    @Transactional
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "decline request specified by id")
+    fun declineRequest(
+        @PathVariable("id") requestId: Long,
+        @RequestParam reason: String,
+    ) {
+        service.declineRequest(requestId, reason)
     }
 }

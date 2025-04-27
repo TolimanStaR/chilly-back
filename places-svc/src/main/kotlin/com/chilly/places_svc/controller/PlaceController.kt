@@ -55,8 +55,8 @@ class PlaceController(
     @Operation(summary = "add one place with owner assigned")
     fun addPlaceInternal(
         @RequestBody data: PlaceDto
-    ) {
-        placeService.addPlaceInternal(data)
+    ): Long {
+        return placeService.addPlaceInternal(data)
     }
 
     @GetMapping("owned_by/{id}/internal")

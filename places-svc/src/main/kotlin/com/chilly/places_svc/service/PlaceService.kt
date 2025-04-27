@@ -3,6 +3,8 @@ package com.chilly.places_svc.service
 import com.chilly.places_svc.mapper.PlaceMapper
 import com.chilly.places_svc.model.Place
 import com.chilly.places_svc.repository.PlaceRepository
+import com.chilly.places_svc.repository.saveAllCheckId
+import com.chilly.places_svc.repository.saveCheckId
 import org.chilly.common.dto.PlaceDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -18,7 +20,7 @@ class PlaceService(
     fun replacePlaces(placeDtoList: List<PlaceDto>) {
         placeRepository.deleteAll()
         placeDtoList.map(placeMapper::toEntity)
-            .let(placeRepository::saveAll)
+            .let(placeRepository::saveAllCheckId)
     }
 
     fun getAllPlaces() = placeRepository.findAll()
@@ -29,17 +31,17 @@ class PlaceService(
 
     fun editPlaceInfo(places: List<PlaceDto>): Int =
         places.mapNotNull(::changePlaceUsingDto)
-            .let(placeRepository::saveAll)
+            .let(placeRepository::saveAllCheckId)
             .size
 
     fun findNearbyPlaces(latitude: Double, longitude: Double, page: Int, size: Int): List<PlaceDto> =
         placeRepository.findNearByPlaces(latitude, longitude, PageRequest.of(page, size))
             .map(placeMapper::toDto)
 
-    fun addPlaceInternal(data: PlaceDto) {
+    fun addPlaceInternal(data: PlaceDto): Long =
         placeMapper.toEntity(data)
-            .let(placeRepository::save)
-    }
+            .let(placeRepository::saveCheckId)
+            .let(Place::id)!!
 
     fun getOwnedPlaces(ownerId: Long): List<PlaceDto> =
         placeRepository.findAllByOwnerId(ownerId)
