@@ -2,10 +2,11 @@ package org.chilly.api_gateway.authority;
 
 import org.springframework.http.HttpMethod;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-public record AllowedEndpoint(String pathPiece, Set<HttpMethod> methods) {
+public record AllowedEndpoint(Pattern pattern, Set<HttpMethod> methods) {
 
-    AllowedEndpoint(String pathPiece, HttpMethod ...method) {
-        this(pathPiece, Set.of(method));
+    AllowedEndpoint(String pathPattern, HttpMethod ...method) {
+        this(Pattern.compile(pathPattern), Set.of(method));
     }
 }

@@ -1,0 +1,4 @@
+ALTER TABLE places
+    ADD COLUMN owner_id BIGINT;
+
+ALTER SEQUENCE place_sequence RESTART WITH 1000;

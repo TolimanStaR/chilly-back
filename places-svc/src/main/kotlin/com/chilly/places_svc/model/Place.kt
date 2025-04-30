@@ -5,11 +5,11 @@ import jakarta.persistence.*
 
 @Entity(name = "place")
 @Table(name = "places")
+@SequenceGenerator(name = "place_sequence", allocationSize = 1, initialValue = 1000)
 class Place(
-    // todo add sequence generator starting from 1000
     @Id
     @Column(name = "id", nullable = false)
-    val id: Long,
+    var id: Long? = null,
 
     @Column(name = "name", nullable = false)
     var name: String,
@@ -46,6 +46,9 @@ class Place(
     @Column(name = "open_hours", nullable = true)
     @Convert(converter = ListToStringConverter::class)
     var openHours: List<String>? = null,
+
+    @Column(name = "owner_id", nullable = true)
+    var ownerId: Long? = null
 ) {
 
     @OneToMany(mappedBy = "place", orphanRemoval = true)

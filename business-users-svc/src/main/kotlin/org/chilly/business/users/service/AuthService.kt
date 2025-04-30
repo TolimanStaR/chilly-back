@@ -15,7 +15,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
 
 @Service
 class AuthService(
@@ -37,15 +36,32 @@ class AuthService(
         repository.save(request.toEntity(userId))
     }
 
-    private fun callSecurityRegister(request: RegisterInternalRequest): Result<Long> = runCatching {
+    fun getMe(userId: Long): BusinessUserDto {
+        val usernameData = callSecurityMe(userId)
+            .getOrElse {
+                println("got exception: ${it::class.simpleName}, ${it.message}")
+                throw CallFailedException("unable to get username data")
+            }
+        val businessUser = repository.findByIdOrNull(userId)
+            ?: throw NoSuchEntityException("Not found user with id=$userId")
+
+        return BusinessUserDto(
+            /* email = */ usernameData.email,
+            /* phoneNumber = */ usernameData.phoneNumber,
+            /* companyName = */ businessUser.companyName,
+            /* legalAddress = */ businessUser.legalAddress,
+            /* inn = */ businessUser.inn,
+            /* businessCategories = */ businessUser.businessCategories.map(categoryMapper::toDto),
+            /* kpp = */ businessUser.kpp
+        )
+    }
+
+    private fun callSecurityRegister(request: RegisterInternalRequest): Result<Long> =
         webClient.post()
             .uri("http://security-svc/api/auth/register/internal")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
-            .retrieve()
-            .bodyToMono(Long::class.java)
-            .block()!!
-    }
+            .awaitResult()
 
     private fun RegisterBusinessUserRequest.toInternal(): RegisterInternalRequest = RegisterInternalRequest(
         this.phoneNumber,
@@ -72,32 +88,9 @@ class AuthService(
         exception?.let { throw it }
     }
 
-    fun getMe(userId: Long): BusinessUserDto {
-        val usernameData = callSecurityMe(userId)
-            .getOrElse {
-                println("got exception: ${it::class.simpleName}, ${it.message}")
-                throw CallFailedException("unable to get username data")
-            }
-        val businessUser = repository.findByIdOrNull(userId)
-            ?: throw NoSuchEntityException("Not found user with id=$userId")
-
-        return BusinessUserDto(
-            usernameData.email,
-            usernameData.phoneNumber,
-            businessUser.companyName,
-            businessUser.legalAddress,
-            businessUser.inn,
-            businessUser.businessCategories.map(categoryMapper::toDto),
-            businessUser.kpp
-        )
-    }
-
-    private fun callSecurityMe(id: Long) = runCatching {
+    private fun callSecurityMe(id: Long): Result<UsernameData> =
         webClient.get()
             .uri("http://security-svc/api/auth/me/$id/internal")
-            .retrieve()
-            .bodyToMono<UsernameData>()
-            .block()!!
-    }
+            .awaitResult()
 
 }
