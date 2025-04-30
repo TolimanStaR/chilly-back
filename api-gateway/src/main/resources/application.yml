@@ -35,5 +35,7 @@ springdoc:
         name: Feedback Service
       - url: /business-users-svc/v3/api-docs
         name: Business Users Service
+      - url: /files-svc/v3/api-docs
+        name: Files Service
   api-docs:
     enabled: true

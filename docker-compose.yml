@@ -119,8 +119,28 @@ services:
       test: "curl --fail --silent --request GET http://eureka:8761/actuator/health | grep UP || exit 1"
       interval: 10s
       timeout: 7s
+      retries: 5
+      start_period: 7s
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_volume:/data
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    command: server --console-address ":9001" /data
+    networks:
+      - chilly-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://minio:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 7s
       retries: 7
-      start_period: 15s
+      start_period: 10s
 
   main:
     depends_on:
@@ -232,6 +252,26 @@ services:
       GATEWAY_PORT: "${GATEWAY_PORT}"
     networks:
       - chilly-net
+
+  files:
+    depends_on:
+      minio:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    image: "tolimanstar/chilly_files:latest"
+    build:
+      context: ./
+      dockerfile: ./files-svc/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MINIO_HOST: minio
+      MINIO_BUCKET: "${MINIO_BUCKET}"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+
+    networks:
+      - chilly-net
   
   gateway:
     depends_on:
@@ -274,6 +314,7 @@ volumes:
   places_pg_volume:
   feedback_pg_volume:
   business_users_pg_volume:
+  minio_volume:
 
 networks:
   chilly-net: {}
