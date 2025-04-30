@@ -19,7 +19,7 @@ class FilesController(
     @PostMapping("upload", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "upload a file, returns saved filename, so file could be downloaded later")
-    fun uploadFile(@RequestParam("file") file: MultipartFile): ResponseEntity<String> {
+    fun uploadFile(@RequestPart file: MultipartFile): ResponseEntity<String> {
         return filesService.uploadFile(file)
     }
 
