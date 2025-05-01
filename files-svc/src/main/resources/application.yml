@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: files-svc
+
+server:
+  port: 0
+
+minio:
+  endpoint: "http://${MINIO_HOST}:9000"
+  accessKey: "${MINIO_ACCESS_KEY}"
+  secretKey: "${MINIO_SECRET_KEY}"
+  bucket: "${MINIO_BUCKET}"
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+springdoc:
+  swagger-ui:
+    try-it-out-enabled: true
+    operations-sorter: method
+    path: /files-svc/swagger-ui.html
+    url: http://localhost:${GATEWAY_PORT}
+  api-docs:
+    path: /files-svc/v3/api-docs

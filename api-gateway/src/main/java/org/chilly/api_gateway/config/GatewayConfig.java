@@ -78,6 +78,13 @@ public class GatewayConfig {
                                 .filters(applyFilter(authFilter))
                                 .uri("lb://business-users-svc")
                 )
+                .route(
+                        "files-svc",
+                        r -> r.path("/api/files/**").or()
+                                .path("/files-svc/v3/api-docs")
+                                .filters(applyFilter(authFilter))
+                                .uri("lb://files-svc")
+                )
                 .build();
     }
 
