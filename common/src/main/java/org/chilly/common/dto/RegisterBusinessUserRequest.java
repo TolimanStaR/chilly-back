@@ -13,8 +13,10 @@ public class RegisterBusinessUserRequest {
     private String phoneNumber;
     private String password;
     private String companyName;
+    private String companyDescription;
     private String legalAddress;
     private String inn;
     private List<BusinessCategoryDto> businessCategories;
     private String kpp;
+    private List<String> images;
 }

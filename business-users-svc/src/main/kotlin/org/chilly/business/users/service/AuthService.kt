@@ -68,7 +68,9 @@ class AuthService(
         legalAddress = this.legalAddress,
         inn = this.inn,
         businessCategories = this.businessCategories.map { BusinessCategory(it.code, it.name) },
-        kpp = this.kpp
+        kpp = this.kpp,
+        companyDescription = this.companyDescription,
+        images = this.images,
     )
 
     private fun checkBusinessInfo(request: RegisterBusinessUserRequest) {

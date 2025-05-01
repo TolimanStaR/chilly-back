@@ -29,10 +29,12 @@ class BusinessUserMapper(private val categoryMapper: BusinessCategoryMapper) {
         /* email = */ usernameData?.email,
         /* phoneNumber = */ usernameData?.phoneNumber,
         /* companyName = */ user.companyName,
+        /* companyDescription = */ user.companyDescription,
         /* legalAddress = */ user.legalAddress,
         /* inn = */ user.inn,
         /* businessCategories = */ user.businessCategories.map(categoryMapper::toDto),
-        /* kpp = */ user.kpp
+        /* kpp = */ user.kpp,
+        /* images = */ user.images
     )
 }
 
