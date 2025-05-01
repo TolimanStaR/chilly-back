@@ -47,14 +47,18 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/business/place_requests/[^/]+/approve", POST),
                     new AllowedEndpoint("api/business/place_requests/[^/]+/decline", POST),
                     new AllowedEndpoint("api/files/upload", POST),
-                    new AllowedEndpoint("api/auth/roles", PUT)
+                    new AllowedEndpoint("api/auth/roles", PUT),
+                    new AllowedEndpoint("api/business/place_requests/pending", GET)
             )),
             Map.entry(Role.BUSINESS, List.of(
                     new AllowedEndpoint("api/business_users/me", GET),
-                    new AllowedEndpoint("api/business/place_requests", POST, GET, PUT, DELETE),
+                    new AllowedEndpoint("api/business/place_requests$", POST, GET, PUT, DELETE),
                     new AllowedEndpoint("/api/business/places", GET),
                     new AllowedEndpoint("api/files/upload", POST),
                     new AllowedEndpoint("api/auth/roles", GET)
+            )),
+            Map.entry(Role.MODERATOR, List.of(
+                    new AllowedEndpoint("api/business/place_requests/pending", GET)
             ))
     );
 

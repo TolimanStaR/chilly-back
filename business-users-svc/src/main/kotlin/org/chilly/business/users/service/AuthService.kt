@@ -1,6 +1,6 @@
 package org.chilly.business.users.service
 
-import org.chilly.business.users.mapper.BusinessCategoryMapper
+import org.chilly.business.users.mapper.BusinessUserMapper
 import org.chilly.business.users.model.BusinessCategory
 import org.chilly.business.users.model.BusinessUser
 import org.chilly.business.users.repository.UserRepository
@@ -19,7 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Service
 class AuthService(
     private val repository: UserRepository,
-    private val categoryMapper: BusinessCategoryMapper,
+    private val businessUserMapper: BusinessUserMapper,
     private val webClient: WebClient,
 ) {
 
@@ -45,15 +45,7 @@ class AuthService(
         val businessUser = repository.findByIdOrNull(userId)
             ?: throw NoSuchEntityException("Not found user with id=$userId")
 
-        return BusinessUserDto(
-            /* email = */ usernameData.email,
-            /* phoneNumber = */ usernameData.phoneNumber,
-            /* companyName = */ businessUser.companyName,
-            /* legalAddress = */ businessUser.legalAddress,
-            /* inn = */ businessUser.inn,
-            /* businessCategories = */ businessUser.businessCategories.map(categoryMapper::toDto),
-            /* kpp = */ businessUser.kpp
-        )
+        return businessUserMapper.toDto(businessUser, usernameData)
     }
 
     private fun callSecurityRegister(request: RegisterInternalRequest): Result<Long> =

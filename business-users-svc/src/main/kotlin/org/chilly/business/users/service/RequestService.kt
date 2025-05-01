@@ -1,9 +1,12 @@
 package org.chilly.business.users.service
 
+import org.chilly.business.users.mapper.BusinessUserMapper
+import org.chilly.business.users.mapper.toDto
 import org.chilly.business.users.model.PlaceAddRequest
 import org.chilly.business.users.model.RequestStatus
 import org.chilly.business.users.repository.PlaceRequestRepository
 import org.chilly.business.users.repository.UserRepository
+import org.chilly.common.dto.PendingRequestDto
 import org.chilly.common.dto.PlaceDto
 import org.chilly.common.dto.PlaceRequestDto
 import org.chilly.common.exception.AccessDeniedException
@@ -22,6 +25,7 @@ class RequestService(
     private val userRepository: UserRepository,
     private val repository: PlaceRequestRepository,
     private val webClient: WebClient,
+    private val userMapper: BusinessUserMapper
 ) {
 
     fun createRequest(userId: Long, request: PlaceDto) {
@@ -102,34 +106,26 @@ class RequestService(
         request.reason = reason
     }
 
+    fun deleteRequest(userId: Long, requestId: Long) {
+        checkExistingRequest(userId, requestId)
+        repository.deleteById(requestId)
+    }
+
+    fun getPendingRequests(): List<PendingRequestDto> {
+        val pendingRequests = repository.findAllPendingRequests()
+        return pendingRequests.map { entity ->
+            PendingRequestDto(
+                entity.toDto(),
+                entity.owner.let(userMapper::toDto)
+            )
+        }.sortedByDescending { request -> request.placeRequest.timestamp }
+    }
+
     private fun checkRequestStatus(request: PlaceAddRequest) {
         if (request.status != RequestStatus.CREATED) {
             throw AccessDeniedException("request has been already approved or declined")
         }
     }
-
-    private fun PlaceAddRequest.toDto() = PlaceRequestDto(
-        /* id = */ id,
-        /* ownerId = */ owner.id,
-        /* timestamp = */ timestamp.toEpochMilli(),
-        /* status = */ status.name,
-        /* reason = */ reason,
-        /* placeInfo = */ PlaceDto(
-            /* id = */ null,
-            /* name = */ name,
-            /* address = */ address,
-            /* website = */ website,
-            /* yPage = */ yPage,
-            /* rating = */ rating,
-            /* images = */ images,
-            /* phone = */ phone,
-            /* social = */ social,
-            /* openHours = */ openHours,
-            /* latitude = */ latitude,
-            /* longitude = */ longitude,
-            /* ownerId = */ owner.id
-        )
-    )
 
     private fun findUserOrThrow(id: Long) =
         userRepository.findByIdOrNull(id)
@@ -156,11 +152,6 @@ class RequestService(
             return
         }
         setter.call(newValue)
-    }
-
-    fun deleteRequest(userId: Long, requestId: Long) {
-        checkExistingRequest(userId, requestId)
-        repository.deleteById(requestId)
     }
 
     private fun checkExistingRequest(userId: Long, requestId: Long): PlaceAddRequest {
