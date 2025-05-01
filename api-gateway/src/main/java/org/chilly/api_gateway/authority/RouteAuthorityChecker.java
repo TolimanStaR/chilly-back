@@ -36,7 +36,8 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/auth/username", PUT),
                     new AllowedEndpoint("api/reviews", POST),
                     new AllowedEndpoint("api/reviews/place/", GET),
-                    new AllowedEndpoint("api/files/upload", POST)
+                    new AllowedEndpoint("api/files/upload", POST),
+                    new AllowedEndpoint("api/auth/roles", GET)
             )),
             Map.entry(Role.ADMIN, List.of(
                     new AllowedEndpoint("api/questions", POST, PUT, GET),
@@ -45,13 +46,15 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/places/nearby", GET),
                     new AllowedEndpoint("api/business/place_requests/[^/]+/approve", POST),
                     new AllowedEndpoint("api/business/place_requests/[^/]+/decline", POST),
-                    new AllowedEndpoint("api/files/upload", POST)
+                    new AllowedEndpoint("api/files/upload", POST),
+                    new AllowedEndpoint("api/auth/roles", PUT)
             )),
             Map.entry(Role.BUSINESS, List.of(
                     new AllowedEndpoint("api/business_users/me", GET),
                     new AllowedEndpoint("api/business/place_requests", POST, GET, PUT, DELETE),
                     new AllowedEndpoint("/api/business/places", GET),
-                    new AllowedEndpoint("api/files/upload", POST)
+                    new AllowedEndpoint("api/files/upload", POST),
+                    new AllowedEndpoint("api/auth/roles", GET)
             ))
     );
 

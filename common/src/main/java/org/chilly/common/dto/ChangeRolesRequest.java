@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginRequest {
-    private String username;
-    private String password;
-    private String role;
+public class ChangeRolesRequest {
+    private List<String> newRoles;
+    private boolean includeCurrent = true;
 }

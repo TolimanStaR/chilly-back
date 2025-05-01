@@ -31,7 +31,6 @@ public class PasswordController {
         passwordService.changePassword(userId, request);
     }
 
-
     @Operation(summary = "send password recovery code to email")
     @PostMapping("email_code")
     @Transactional
@@ -53,6 +52,4 @@ public class PasswordController {
     public void recoverPassword(@RequestBody PasswordRecoveryRequest request) {
         passwordService.recoverPassword(request);
     }
-
-
 }
