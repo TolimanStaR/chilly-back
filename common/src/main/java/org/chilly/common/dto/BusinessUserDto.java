@@ -15,8 +15,10 @@ public class BusinessUserDto {
     private String email;
     private String phoneNumber;
     private String companyName;
+    private String companyDescription;
     private String legalAddress;
     private String inn;
     private List<BusinessCategoryDto> businessCategories;
     private String kpp;
+    private List<String> images;
 }

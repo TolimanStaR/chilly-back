@@ -1,4 +1,3 @@
-@file:Suppress("UNUSED")
 package org.chilly.business.users.controller
 
 import io.swagger.v3.oas.annotations.Operation
@@ -9,17 +8,7 @@ import org.chilly.business.users.service.RequestService
 import org.chilly.common.dto.PlaceDto
 import org.chilly.common.dto.PlaceRequestDto
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/business/place_requests")
@@ -70,26 +59,5 @@ class PlaceRequestController(
         @PathVariable("id") requestId: Long,
     ) {
         return service.deleteRequest(userId, requestId)
-    }
-
-    @PostMapping("{id}/approve")
-    @Transactional
-    @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "approve request specified by id")
-    fun approveRequest(
-        @PathVariable("id") requestId: Long,
-    ) {
-        service.approveRequest(requestId)
-    }
-
-    @PostMapping("{id}/decline")
-    @Transactional
-    @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "decline request specified by id")
-    fun declineRequest(
-        @PathVariable("id") requestId: Long,
-        @RequestParam reason: String,
-    ) {
-        service.declineRequest(requestId, reason)
     }
 }
