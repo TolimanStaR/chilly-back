@@ -70,6 +70,8 @@ class RequestService(
 
     fun changeRequest(userId: Long, requestId: Long, data: PlaceDto) {
         val request = checkExistingRequest(userId, requestId)
+        checkRequestStatus(request)
+
         request::name.checkAndSet(data.name)
         request::address.checkAndSet(data.address)
         request::website.checkAndSet(data.website)

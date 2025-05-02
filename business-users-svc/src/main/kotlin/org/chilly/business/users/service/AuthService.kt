@@ -26,22 +26,12 @@ class AuthService(
     fun register(request: RegisterBusinessUserRequest) {
         checkBusinessInfo(request)
 
-        val userId = callSecurityRegister(request.toInternal())
-            .getOrElse {
-                println("error: ${it::class.simpleName}${it.message}")
-                // todo if can be parsed then rethrow original
-                throw CallFailedException("Internal register in security service failed")
-            }
-
+        val userId = callSecurityRegister(request.toInternal()).getOrRethrowLogging()
         repository.save(request.toEntity(userId))
     }
 
     fun getMe(userId: Long): BusinessUserDto {
-        val usernameData = callSecurityMe(userId)
-            .getOrElse {
-                println("got exception: ${it::class.simpleName}, ${it.message}")
-                throw CallFailedException("unable to get username data")
-            }
+        val usernameData = callSecurityMe(userId).getOrRethrowLogging()
         val businessUser = repository.findByIdOrNull(userId)
             ?: throw NoSuchEntityException("Not found user with id=$userId")
 
@@ -54,6 +44,16 @@ class AuthService(
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
             .awaitResult()
+
+    private fun callSecurityMe(id: Long): Result<UsernameData> =
+        webClient.get()
+            .uri("http://security-svc/api/auth/me/$id/internal")
+            .awaitResult()
+
+    private fun <T> Result<T>.getOrRethrowLogging() = getOrElse {
+        println("got exception: ${it::class.simpleName}, ${it.message}")
+        throw CallFailedException("unable to get username data")
+    }
 
     private fun RegisterBusinessUserRequest.toInternal(): RegisterInternalRequest = RegisterInternalRequest(
         this.phoneNumber,
@@ -81,10 +81,4 @@ class AuthService(
         }
         exception?.let { throw it }
     }
-
-    private fun callSecurityMe(id: Long): Result<UsernameData> =
-        webClient.get()
-            .uri("http://security-svc/api/auth/me/$id/internal")
-            .awaitResult()
-
 }
