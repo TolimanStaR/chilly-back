@@ -288,6 +288,7 @@ services:
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
       API_KEY: "${API_KEY}"
+      SSL_KEYSTORE_PASSWORD: "${SSL_KEYSTORE_PASSWORD}"
     networks:
       - chilly-net
     healthcheck:
