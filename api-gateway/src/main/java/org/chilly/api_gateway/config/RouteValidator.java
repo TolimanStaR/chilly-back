@@ -19,7 +19,8 @@ public class RouteValidator {
             "/actuator",
             "/api/password/recovery",
             "/api/email_code",
-            "/api/files/download"
+            "/api/files/download",
+            "/api/files/upload"
     );
 
     private final Predicate<ServerHttpRequest> securedPredicate = (request) -> {

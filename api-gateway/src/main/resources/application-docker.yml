@@ -2,3 +2,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://eureka:8761/eureka
+
+server:
+  ssl:
+    key-store: /etc/certs/keystore.p12

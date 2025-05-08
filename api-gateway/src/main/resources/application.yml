@@ -18,6 +18,13 @@ http:
     user-id: UserId
 
 server:
+  # TODO plug in host directory to search for keystore instead of storing it in classpath resources
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: "${SSL_KEYSTORE_PASSWORD}"
+    key-store-type: PKCS12
+    key-alias: "${SSL_KEYSTORE_KEY}"
   port: ${GATEWAY_PORT}
 
 springdoc:
