@@ -5,7 +5,12 @@ import org.testcontainers.containers.GenericContainer;
 import static java.lang.System.setProperty;
 
 public class EurekaTestContainer extends GenericContainer<EurekaTestContainer> {
-    private static final String IMAGE_VERSION = "springcloud/eureka";
+    /**
+     *  uses actual discovery service from this project;
+     *  this image mainly relies on default spring cloud eureka configuration
+     *  and expected not to change often (mainly doesn't change at all) therefore could be used in tests
+     */
+    private static final String IMAGE_VERSION = "tolimanstar/chilly_discovery_server:latest";
     private static final int EUREKA_PORT = 8761;
     private static EurekaTestContainer instance = null;
 
