@@ -36,7 +36,6 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/auth/username", PUT),
                     new AllowedEndpoint("api/reviews", POST),
                     new AllowedEndpoint("api/reviews/place/", GET),
-                    new AllowedEndpoint("api/files/upload", POST),
                     new AllowedEndpoint("api/auth/roles", GET)
             )),
             Map.entry(Role.ADMIN, List.of(
@@ -46,7 +45,6 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/places/nearby", GET),
                     new AllowedEndpoint("api/business/place_requests/[^/]+/approve", POST),
                     new AllowedEndpoint("api/business/place_requests/[^/]+/decline", POST),
-                    new AllowedEndpoint("api/files/upload", POST),
                     new AllowedEndpoint("api/auth/roles", PUT),
                     new AllowedEndpoint("api/business/place_requests/pending", GET)
             )),
@@ -55,7 +53,6 @@ public class RouteAuthorityChecker {
                     new AllowedEndpoint("api/business/place_requests$", POST, GET),
                     new AllowedEndpoint("api/business/place_requests/[0-9]+$", PUT, DELETE),
                     new AllowedEndpoint("/api/business/places", GET),
-                    new AllowedEndpoint("api/files/upload", POST),
                     new AllowedEndpoint("api/auth/roles", GET)
             )),
             Map.entry(Role.MODERATOR, List.of(

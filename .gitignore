@@ -10,4 +10,4 @@ target/
 *.iws
 *.iml
 *.ipr
-/api-gateway/**/keystore.p12
+*.p12
