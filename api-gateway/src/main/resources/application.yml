@@ -24,7 +24,7 @@ server:
     key-store: classpath:keystore.p12
     key-store-password: "${SSL_KEYSTORE_PASSWORD}"
     key-store-type: PKCS12
-    key-alias: chily-ssl-key
+    key-alias: "${SSL_KEYSTORE_KEY}"
   port: ${GATEWAY_PORT}
 
 springdoc:
