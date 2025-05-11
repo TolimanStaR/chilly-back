@@ -6,6 +6,11 @@ COPY common/src /app/common/src
 RUN --mount=type=cache,target=/root/.m2 \
     mvn -f /app/common/pom.xml clean install
 
+COPY common-test/pom.xml /app/common-test/pom.xml
+COPY common-test/src /app/common-test/src
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -f /app/common-test/pom.xml clean install
+
 COPY places-svc/pom.xml /app/module/pom.xml
 COPY places-svc/src /app/module/src
 RUN --mount=type=cache,target=/root/.m2 \
