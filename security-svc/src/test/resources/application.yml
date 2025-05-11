@@ -44,3 +44,8 @@ security:
 http:
   headers:
     user-id: UserId
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: "${EUREKA_TEST_URL}"

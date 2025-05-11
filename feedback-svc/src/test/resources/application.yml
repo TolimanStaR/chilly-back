@@ -16,6 +16,10 @@ spring:
     hibernate:
       ddl-auto: validate
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: "${EUREKA_TEST_URL}"
 
 testcontainers:
   reuse:

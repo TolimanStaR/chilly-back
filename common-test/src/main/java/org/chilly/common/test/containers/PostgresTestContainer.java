@@ -1,14 +1,19 @@
-package com.chilly.main_svc.containers;
+package org.chilly.common.test.containers;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 
+/**
+ *  Instantiated conatiner sets "DB_URL", "DB_USER", "DB_PASSWORD" environment variables
+ *  use provided values in test/resources/application.yml for datasource configuration
+ */
 public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer> {
 
-    public static final String IMAGE_VERSION = "postgres:alpine";
-    public static final String DATABASE_NAME = "test";
+    private static final String IMAGE_VERSION = "postgres:alpine";
+    private static final String DATABASE_NAME = "test";
+
     private static PostgresTestContainer container;
 
-    public PostgresTestContainer() {
+    private PostgresTestContainer() {
         super(IMAGE_VERSION);
     }
 

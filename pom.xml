@@ -23,6 +23,7 @@
         <module>api-gateway</module>
         <module>places-svc</module>
         <module>common</module>
+        <module>common-test</module>
         <module>feedback-svc</module>
         <module>business-users-svc</module>
         <module>files-svc</module>

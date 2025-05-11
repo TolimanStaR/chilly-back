@@ -8,6 +8,10 @@ minio:
   secretKey: "${MINIO_SECRET_KEY}"
   bucket: "testbucket"
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: "${EUREKA_TEST_URL}"
 
 testcontainers:
   reuse:

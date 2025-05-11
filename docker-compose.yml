@@ -11,6 +11,8 @@ services:
     restart: unless-stopped
     command:
       - "-p ${MAIN_DB_PORT}"
+    ports:
+      - "${MAIN_DB_PORT}:${MAIN_DB_PORT}"
     networks:
       - chilly-net
     healthcheck:
@@ -63,7 +65,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 7s
-      
+
   feedback_db:
     image: postgres:alpine
     volumes:
@@ -85,7 +87,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 7s
-      
+
   business_users_db:
     image: postgres:alpine
     volumes:
@@ -99,6 +101,8 @@ services:
       - "-p ${BIZ_USR_DB_PORT}"
     networks:
       - chilly-net
+    ports:
+      - "${BIZ_USR_DB_PORT}:${BIZ_USR_DB_PORT}"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${BIZ_USR_USER} -d ${BIZ_USR_DB} -p ${BIZ_USR_DB_PORT}" ]
       interval: 10s
@@ -113,6 +117,7 @@ services:
       dockerfile: ./discovery-server/Dockerfile
     environment:
       SPRING_PROFILE_ACTIVE: docker
+    restart: unless-stopped
     networks:
       - chilly-net
     healthcheck:
@@ -132,6 +137,7 @@ services:
     environment:
       MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
       MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    restart: unless-stopped
     command: server --console-address ":9001" /data
     networks:
       - chilly-net
@@ -160,8 +166,15 @@ services:
       MAIN_PASSWORD: "${MAIN_PASSWORD}"
       MAIN_DB_PORT: "${MAIN_DB_PORT}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+    restart: unless-stopped
     networks:
       - chilly-net
+    healthcheck:
+      test:  ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 10s
 
   security:
     depends_on:
@@ -187,8 +200,15 @@ services:
       DEF_ADMIN_USER: "${DEF_ADMIN_USER}"
       DEF_ADMIN_PASSWORD: "${DEF_ADMIN_PASSWORD}"
       DEF_ADMIN_PASSWORD_HASH: "${DEF_ADMIN_PASSWORD_HASH}"
+    restart: unless-stopped
     networks:
       - chilly-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 10s
 
   places:
     depends_on:
@@ -208,8 +228,15 @@ services:
       PLACE_PASSWORD: "${PLACE_PASSWORD}"
       PLACE_DB_PORT: "${PLACE_DB_PORT}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+    restart: unless-stopped
     networks:
       - chilly-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 10s
 
   feedback:
     depends_on:
@@ -229,9 +256,16 @@ services:
       FEEDBACK_PASSWORD: "${FEEDBACK_PASSWORD}"
       FEEDBACK_DB_PORT: "${FEEDBACK_DB_PORT}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+    restart: unless-stopped
     networks:
       - chilly-net
-    
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 10s
+
   business_users:
     depends_on:
       business_users_db:
@@ -250,8 +284,15 @@ services:
       BIZ_USR_PASSWORD: "${BIZ_USR_PASSWORD}"
       BIZ_USR_DB_PORT: "${BIZ_USR_DB_PORT}"
       GATEWAY_PORT: "${GATEWAY_PORT}"
+    restart: unless-stopped
     networks:
       - chilly-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 10s
 
   files:
     depends_on:
@@ -269,13 +310,31 @@ services:
       MINIO_BUCKET: "${MINIO_BUCKET}"
       MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
       MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
-
+    restart: unless-stopped
     networks:
       - chilly-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 10s
   
   gateway:
     depends_on:
       eureka:
+        condition: service_healthy
+      main:
+        condition: service_healthy
+      security:
+        condition: service_healthy
+      places:
+        condition: service_healthy
+      feedback:
+        condition: service_healthy
+      business_users:
+        condition: service_healthy
+      files:
         condition: service_healthy
     image: "tolimanstar/cilly_gateway:latest"
     build:
@@ -290,6 +349,7 @@ services:
       API_KEY: "${API_KEY}"
       SSL_KEYSTORE_PASSWORD: "${SSL_KEYSTORE_PASSWORD}"
       SSL_KEYSTORE_KEY: "${SSL_KEYSTORE_KEY}"
+    restart: unless-stopped
     networks:
       - chilly-net
     healthcheck:

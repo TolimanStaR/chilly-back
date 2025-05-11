@@ -1,6 +1,11 @@
 FROM maven:3.8.5-openjdk-17 AS build
-
 COPY pom.xml /app/pom.xml
+
+COPY common-test/pom.xml /app/common-test/pom.xml
+COPY common-test/src /app/common-test/src
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -f /app/common-test/pom.xml clean install
+
 COPY api-gateway/pom.xml /app/module/pom.xml
 COPY api-gateway/src /app/module/src
 RUN --mount=type=cache,target=/root/.m2 \

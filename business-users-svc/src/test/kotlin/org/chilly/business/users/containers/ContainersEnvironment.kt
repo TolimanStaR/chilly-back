@@ -1,5 +1,7 @@
 package org.chilly.business.users.containers
 
+import org.chilly.common.test.containers.EurekaTestContainer
+import org.chilly.common.test.containers.PostgresTestContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -7,8 +9,9 @@ import org.testcontainers.junit.jupiter.Testcontainers
 open class ContainersEnvironment {
 
     companion object {
-        @Suppress("UNUSED")
         @Container
-        val postgresTestContainer = PostgresTestContainer()
+        val postgresTestContainer: PostgresTestContainer = PostgresTestContainer.getInstance()
+        @Container
+        val eurekaTestContainer: EurekaTestContainer = EurekaTestContainer.getInstance()
     }
 }
