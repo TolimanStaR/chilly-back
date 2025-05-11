@@ -1,14 +1,16 @@
 package com.chilly.feedback_svc.containers
 
+import org.chilly.common.test.containers.EurekaTestContainer
+import org.chilly.common.test.containers.PostgresTestContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
 open class ContainersEnvironment {
-
     companion object {
-        @Suppress("UNUSED")
         @Container
-        val postgresTestContainer = PostgresTestContainer()
+        val postgresTestContainer: PostgresTestContainer = PostgresTestContainer.getInstance()
+        @Container
+        val eurekaTestContainer: EurekaTestContainer = EurekaTestContainer.getInstance()
     }
 }

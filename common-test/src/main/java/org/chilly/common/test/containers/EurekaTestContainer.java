@@ -1,9 +1,13 @@
-package org.chilly.api_gateway.containers;
+package org.chilly.common.test.containers;
 
 import org.testcontainers.containers.GenericContainer;
 
 import static java.lang.System.setProperty;
 
+/**
+ *  Instantiated conatiner sets "EUREKA_TEST_URL" environment variable
+ *  use provided url in test/resources/application.yml cofiguration file to connect to a EurekaTestContainer
+ */
 public class EurekaTestContainer extends GenericContainer<EurekaTestContainer> {
     /**
      *  uses actual discovery service from this project;
@@ -32,7 +36,7 @@ public class EurekaTestContainer extends GenericContainer<EurekaTestContainer> {
     @Override
     public void stop() {}
 
-    static EurekaTestContainer getInstance() {
+    public static EurekaTestContainer getInstance() {
         if (instance == null) {
             instance = new EurekaTestContainer()
                     .withExposedPorts(EUREKA_PORT);
