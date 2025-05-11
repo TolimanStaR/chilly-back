@@ -23,21 +23,20 @@ interface PlaceRepository : JpaRepository<Place, Long> {
 
     @Query("SELECT NEXTVAL('place_sequence')", nativeQuery = true)
     fun getNextIdFromSequence(): Long
-
 }
 
 fun PlaceRepository.saveCheckId(place: Place): Place {
-    if (place.id == null) {
-        place.id = getNextIdFromSequence()
-    }
+    ensureHasId(place)
     return save(place)
 }
 
 fun PlaceRepository.saveAllCheckId(places: Iterable<Place>): List<Place> {
-    places.forEach { place ->
-        if (place.id == null) {
-            place.id = getNextIdFromSequence()
-        }
-    }
+    places.forEach(this::ensureHasId)
     return saveAll(places)
+}
+
+private fun PlaceRepository.ensureHasId(place: Place) {
+    if (place.id == null) {
+        place.id = getNextIdFromSequence()
+    }
 }
