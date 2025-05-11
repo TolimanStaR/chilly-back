@@ -173,8 +173,8 @@ services:
       test:  ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 7s
-      retries: 5
-      start_period: 7s
+      retries: 10
+      start_period: 10s
 
   security:
     depends_on:
@@ -207,8 +207,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 7s
-      retries: 5
-      start_period: 7s
+      retries: 10
+      start_period: 10s
 
   places:
     depends_on:
@@ -235,8 +235,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 7s
-      retries: 5
-      start_period: 7s
+      retries: 10
+      start_period: 10s
 
   feedback:
     depends_on:
@@ -263,8 +263,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 7s
-      retries: 5
-      start_period: 7s
+      retries: 10
+      start_period: 10s
 
   business_users:
     depends_on:
@@ -291,8 +291,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 7s
-      retries: 5
-      start_period: 7s
+      retries: 10
+      start_period: 10s
 
   files:
     depends_on:
@@ -317,8 +317,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 10s
       timeout: 7s
-      retries: 5
-      start_period: 7s
+      retries: 10
+      start_period: 10s
   
   gateway:
     depends_on:
