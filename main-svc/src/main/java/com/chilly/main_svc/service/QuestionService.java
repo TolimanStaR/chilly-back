@@ -48,7 +48,7 @@ public class QuestionService {
         question.setAnswers(saveAnswers(newQuestion.getAnswers()));
     }
 
-    private void saveQuestionWithAnswers(QuestionWithAnswers questionWithAnswers, QuizType type) {
+    void saveQuestionWithAnswers(QuestionWithAnswers questionWithAnswers, QuizType type) {
         Question question = saveQuestion(questionWithAnswers, type);
         List<Answer> answers = questionWithAnswers.getAnswers().stream()
                 .map(answerText -> buildAnswer(question, answerText))
@@ -56,7 +56,7 @@ public class QuestionService {
         answerRepository.saveAll(answers);
     }
 
-    private Question saveQuestion(QuestionWithAnswers question, QuizType type) {
+    Question saveQuestion(QuestionWithAnswers question, QuizType type) {
         return questionRepository.save(
                 Question.builder()
                         .quizType(type)
@@ -66,7 +66,7 @@ public class QuestionService {
         );
     }
 
-    private Answer buildAnswer(Question question, String answerText) {
+    Answer buildAnswer(Question question, String answerText) {
         return Answer.builder()
                 .body(answerText)
                 .question(question)
@@ -74,13 +74,13 @@ public class QuestionService {
 
     }
 
-    private Answer buildAnswerWithNoQuestion(String answerText) {
+    Answer buildAnswerWithNoQuestion(String answerText) {
         return Answer.builder()
                 .body(answerText)
                 .build();
     }
 
-    private Set<Answer> saveAnswers(List<String> answerTexts) {
+    Set<Answer> saveAnswers(List<String> answerTexts) {
         List<Answer> answers = answerTexts.stream()
                 .map(this::buildAnswerWithNoQuestion)
                 .toList();

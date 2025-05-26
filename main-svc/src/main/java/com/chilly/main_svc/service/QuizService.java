@@ -39,11 +39,11 @@ public class QuizService {
         user.getQuizAnswers().forEach(checkIdAndModify(answerDto));
     }
 
-    private Predicate<QuizAnswer> hasSameType(QuizType type) {
+    Predicate<QuizAnswer> hasSameType(QuizType type) {
         return answer -> answer.getQuestion().getQuizType() == type;
     }
 
-    private void saveNewAnswers(List<QuizAnswerDto> dtoList, User user) {
+    void saveNewAnswers(List<QuizAnswerDto> dtoList, User user) {
         List<QuizAnswer> answerList = dtoList.stream()
                 .map(dto -> buildQuizAnswer(dto, user))
                 .toList();
@@ -51,7 +51,7 @@ public class QuizService {
         quizRepository.saveAll(answerList);
     }
 
-    private QuizAnswer buildQuizAnswer(QuizAnswerDto dto, User user) {
+    QuizAnswer buildQuizAnswer(QuizAnswerDto dto, User user) {
         Question question = findQuestionByIdOrException(dto.getQuestionId());
         Answer answer = findAnswerByIdOrException(dto.getAnswerId());
 
@@ -62,7 +62,7 @@ public class QuizService {
                 .build();
     }
 
-    private Consumer<QuizAnswer> checkIdAndModify(QuizAnswerDto answerDto) {
+    Consumer<QuizAnswer> checkIdAndModify(QuizAnswerDto answerDto) {
         return quizAnswer -> {
             if (doNotMatch(quizAnswer, answerDto)) {
                 return;
@@ -71,17 +71,17 @@ public class QuizService {
         };
     }
 
-    private Answer findAnswerByIdOrException(Long id) {
+    Answer findAnswerByIdOrException(Long id) {
         return answerRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException("No answer with id = " + id));
     }
 
-    private Question findQuestionByIdOrException(Long id) {
+    Question findQuestionByIdOrException(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException("No question with id =" + id));
     }
 
-    private boolean doNotMatch(QuizAnswer answer, QuizAnswerDto answerDto) {
+    boolean doNotMatch(QuizAnswer answer, QuizAnswerDto answerDto) {
         return !Objects.equals(answer.getQuestion().getId(), answerDto.getQuestionId());
     }
 }

@@ -56,7 +56,7 @@ public class UserService {
                 .orElseThrow(() -> new NoSuchEntityException("No user with id =" + id));
     }
 
-    private <T> void checkAndChange(T value, T oldValue, Consumer<T> setter) {
+    <T> void checkAndChange(T value, T oldValue, Consumer<T> setter) {
         if (value != null && oldValue != value) {
             setter.accept(value);
         }
